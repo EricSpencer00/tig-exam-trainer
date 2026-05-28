@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TIG Exam Trainer — The Three Books</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,900;1,9..144,400&family=Archivo:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#16120c; --ink-2:#1d1810; --surface:#221c13; --surface-2:#2a2318;
+  --line:#3a3122; --line-2:#4a3f2c;
+  --paper:#efe6d2; --paper-dim:#cfc3a8; --muted:#9a8d71;
+  --gold:#d7b25e; --gold-deep:#b8923f; --gold-soft:#e8cf94;
+  --green:#7fb38a; --green-bg:#1f3326; --red:#d07a6d; --red-bg:#3a221e;
+  --elon:#7fb0c4; --naval:#a3c08a; --thiel:#d3956b;
+  --shadow:0 18px 50px -20px rgba(0,0,0,.7);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  background:
+    radial-gradient(1200px 700px at 50% -10%, #241d12 0%, transparent 60%),
+    radial-gradient(900px 600px at 100% 110%, #1c1810 0%, transparent 55%),
+    var(--ink);
+  color:var(--paper); font-family:'Archivo',system-ui,sans-serif;
+  line-height:1.55; -webkit-font-smoothing:antialiased;
+  min-height:100%;
+}
+body::before{
+  content:""; position:fixed; inset:0; pointer-events:none; opacity:.05; z-index:0;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+.wrap{position:relative; z-index:1; max-width:880px; margin:0 auto; padding:34px 22px 90px}
+.mono{font-family:'JetBrains Mono',monospace}
+.serif{font-family:'Fraunces',serif}
+
+/* Header */
+.masthead{text-align:center; border-bottom:1px solid var(--line); padding-bottom:22px; margin-bottom:30px}
+.eyebrow{font-size:11px; letter-spacing:.42em; text-transform:uppercase; color:var(--gold); font-weight:600}
+.rule-dot{display:inline-flex; align-items:center; gap:11px; margin:9px 0 4px; color:var(--gold-deep)}
+.rule-dot::before,.rule-dot::after{content:""; height:1px; width:46px; background:linear-gradient(90deg,transparent,var(--gold-deep))}
+.rule-dot::after{background:linear-gradient(90deg,var(--gold-deep),transparent)}
+h1.title{font-family:'Fraunces',serif; font-weight:900; font-size:clamp(34px,6vw,58px); line-height:.98; letter-spacing:-.01em; margin:4px 0 8px}
+h1.title em{font-style:italic; color:var(--gold-soft); font-weight:400}
+.sub{color:var(--paper-dim); font-size:15px; max-width:560px; margin:0 auto}
+.barbadge{display:inline-block; margin-top:14px; font-size:12px; letter-spacing:.05em; color:var(--paper-dim);
+  border:1px solid var(--line-2); border-radius:999px; padding:6px 15px; background:rgba(215,178,94,.06)}
+.barbadge b{color:var(--gold)}
+
+/* Mode cards */
+.modes{display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-bottom:26px}
+@media(max-width:640px){.modes{grid-template-columns:1fr}}
+.mode{
+  position:relative; text-align:left; cursor:pointer; border:1px solid var(--line);
+  background:linear-gradient(170deg,var(--surface),var(--ink-2)); border-radius:16px;
+  padding:22px 20px 20px; color:var(--paper); transition:.25s; overflow:hidden;
+}
+.mode:hover{transform:translateY(-3px); border-color:var(--gold-deep); box-shadow:var(--shadow)}
+.mode .num{font-family:'Fraunces',serif; font-style:italic; font-size:34px; color:var(--gold); line-height:1}
+.mode h3{font-family:'Fraunces',serif; font-weight:600; font-size:21px; margin:10px 0 5px}
+.mode p{font-size:13px; color:var(--muted); min-height:54px}
+.mode .go{margin-top:8px; font-size:12px; letter-spacing:.14em; text-transform:uppercase; color:var(--gold-deep); font-weight:600}
+.mode:hover .go{color:var(--gold)}
+
+/* Filters */
+.panel{border:1px solid var(--line); background:var(--ink-2); border-radius:16px; padding:18px 20px; margin-bottom:24px}
+.panel-h{font-size:11px; letter-spacing:.28em; text-transform:uppercase; color:var(--muted); margin-bottom:13px}
+.chips{display:flex; flex-wrap:wrap; gap:9px}
+.chip{cursor:pointer; border:1px solid var(--line-2); background:transparent; color:var(--paper-dim);
+  border-radius:999px; padding:8px 16px; font-size:13px; font-family:inherit; transition:.18s; font-weight:500}
+.chip:hover{border-color:var(--gold-deep); color:var(--paper)}
+.chip.on{background:var(--gold); color:#241c0c; border-color:var(--gold); font-weight:600}
+.chip .dot{display:inline-block; width:8px; height:8px; border-radius:50%; margin-right:7px; vertical-align:1px}
+
+/* Buttons */
+.btn{cursor:pointer; font-family:inherit; font-weight:600; border-radius:11px; border:1px solid var(--line-2);
+  background:var(--surface-2); color:var(--paper); padding:12px 22px; font-size:14px; transition:.18s; letter-spacing:.02em}
+.btn:hover{border-color:var(--gold-deep)}
+.btn.primary{background:var(--gold); color:#241c0c; border-color:var(--gold)}
+.btn.primary:hover{background:var(--gold-soft)}
+.btn.ghost{background:transparent}
+.btn:disabled{opacity:.4; cursor:not-allowed}
+.btn-row{display:flex; gap:11px; flex-wrap:wrap; align-items:center}
+
+/* Top bar (in-session) */
+.topbar{display:flex; align-items:center; justify-content:space-between; gap:14px; margin-bottom:20px; flex-wrap:wrap}
+.topbar .left{display:flex; align-items:center; gap:14px}
+.back{cursor:pointer; background:none; border:none; color:var(--muted); font-family:inherit; font-size:13px; display:flex; align-items:center; gap:6px}
+.back:hover{color:var(--gold)}
+.counter{font-size:13px; color:var(--paper-dim)} .counter b{color:var(--gold)}
+.timer{font-family:'JetBrains Mono',monospace; font-size:20px; font-weight:600; color:var(--gold);
+  border:1px solid var(--line-2); border-radius:9px; padding:5px 13px; background:var(--ink-2)}
+.timer.warn{color:var(--red); border-color:var(--red)}
+.score-pill{font-size:13px; color:var(--paper-dim)} .score-pill b{color:var(--green)}
+
+/* Progress */
+.progress{height:5px; background:var(--surface); border-radius:99px; overflow:hidden; margin-bottom:24px}
+.progress > i{display:block; height:100%; background:linear-gradient(90deg,var(--gold-deep),var(--gold-soft)); transition:width .35s; border-radius:99px}
+
+/* Card / question */
+.qcard{border:1px solid var(--line); background:linear-gradient(180deg,var(--surface),var(--ink-2));
+  border-radius:18px; padding:26px 26px 24px; box-shadow:var(--shadow)}
+.qtag{display:inline-flex; align-items:center; gap:7px; font-size:11px; letter-spacing:.12em; text-transform:uppercase;
+  color:var(--paper-dim); border:1px solid var(--line-2); border-radius:999px; padding:5px 12px; margin-bottom:16px}
+.qtag .dot{width:8px;height:8px;border-radius:50%}
+.qtopic{color:var(--muted); font-weight:500}
+.qtext{font-family:'Fraunces',serif; font-size:clamp(20px,3.3vw,26px); line-height:1.3; font-weight:500; margin-bottom:22px}
+.opts{display:flex; flex-direction:column; gap:11px}
+.opt{display:flex; gap:14px; align-items:flex-start; text-align:left; cursor:pointer; width:100%;
+  border:1px solid var(--line-2); background:var(--ink-2); color:var(--paper); border-radius:12px;
+  padding:15px 16px; font-family:inherit; font-size:15px; line-height:1.4; transition:.16s}
+.opt:hover:not(:disabled){border-color:var(--gold-deep); background:var(--surface-2)}
+.opt .key{flex:none; width:27px; height:27px; border-radius:7px; border:1px solid var(--line-2);
+  display:flex; align-items:center; justify-content:center; font-family:'JetBrains Mono',monospace;
+  font-size:13px; font-weight:600; color:var(--gold); background:var(--surface)}
+.opt.sel{border-color:var(--gold); background:var(--surface-2)}
+.opt.sel .key{background:var(--gold); color:#241c0c; border-color:var(--gold)}
+.opt.correct{border-color:var(--green); background:var(--green-bg)}
+.opt.correct .key{background:var(--green); color:#10210f; border-color:var(--green)}
+.opt.wrong{border-color:var(--red); background:var(--red-bg)}
+.opt.wrong .key{background:var(--red); color:#2a0f0c; border-color:var(--red)}
+.opt:disabled{cursor:default}
+.opt .txt{padding-top:3px}
+
+/* Explanation / reveal */
+.explain{margin-top:18px; border-left:3px solid var(--gold-deep); background:rgba(215,178,94,.06);
+  border-radius:0 10px 10px 0; padding:14px 16px; font-size:14px; color:var(--paper-dim)}
+.explain b{color:var(--gold-soft); font-weight:600}
+.explain .verdict{font-family:'Fraunces',serif; font-weight:600; font-size:16px; margin-bottom:5px; display:block}
+.explain .verdict.ok{color:var(--green)} .explain .verdict.no{color:var(--red)}
+
+.nav-row{display:flex; justify-content:space-between; gap:11px; margin-top:22px; align-items:center; flex-wrap:wrap}
+
+/* Flashcard reveal block */
+.flip{margin-top:20px; border-top:1px dashed var(--line-2); padding-top:18px}
+.flip .ans-key{font-family:'Fraunces',serif; font-size:18px; color:var(--green); font-weight:600; margin-bottom:7px}
+
+/* Exam grid nav */
+.qgrid{display:flex; flex-wrap:wrap; gap:7px; margin-top:18px}
+.qbtn{width:34px; height:34px; border-radius:8px; border:1px solid var(--line-2); background:var(--ink-2);
+  color:var(--paper-dim); font-family:'JetBrains Mono',monospace; font-size:12px; cursor:pointer; transition:.15s}
+.qbtn:hover{border-color:var(--gold-deep)}
+.qbtn.answered{background:var(--surface-2); color:var(--gold); border-color:var(--gold-deep)}
+.qbtn.current{outline:2px solid var(--gold); outline-offset:1px}
+.qbtn.flagged{border-color:var(--red); color:var(--red)}
+
+/* Results */
+.result{text-align:center; border:1px solid var(--line); border-radius:20px; padding:38px 26px;
+  background:linear-gradient(180deg,var(--surface),var(--ink-2)); box-shadow:var(--shadow)}
+.result .verdict-big{font-family:'Fraunces',serif; font-weight:900; font-size:clamp(28px,6vw,46px); line-height:1}
+.result .verdict-big.pass{color:var(--green)} .result .verdict-big.fail{color:var(--gold-soft)}
+.ring{margin:22px auto 14px; width:172px; height:172px; position:relative}
+.ring svg{transform:rotate(-90deg)} 
+.ring .pct{position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center}
+.ring .pct .n{font-family:'Fraunces',serif; font-weight:900; font-size:46px; line-height:1}
+.ring .pct .l{font-size:12px; letter-spacing:.2em; text-transform:uppercase; color:var(--muted)}
+.breakdown{display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin:24px 0 6px}
+@media(max-width:560px){.breakdown{grid-template-columns:1fr}}
+.bk{border:1px solid var(--line); border-radius:12px; padding:14px; text-align:left; background:var(--ink-2)}
+.bk .nm{font-size:12px; color:var(--muted); display:flex; align-items:center; gap:7px}
+.bk .sc{font-family:'Fraunces',serif; font-size:24px; font-weight:600; margin-top:4px}
+.bk .mini{height:4px; background:var(--surface); border-radius:99px; margin-top:8px; overflow:hidden}
+.bk .mini > i{display:block; height:100%; border-radius:99px}
+
+.review-h{font-family:'Fraunces',serif; font-size:22px; margin:34px 0 14px; font-weight:600}
+.rev{border:1px solid var(--line); border-radius:13px; padding:16px 18px; margin-bottom:12px; background:var(--ink-2)}
+.rev .q{font-family:'Fraunces',serif; font-size:16px; margin-bottom:9px}
+.rev .line{font-size:13.5px; margin:3px 0}
+.rev .yours{color:var(--red)} .rev .right{color:var(--green)}
+.rev .exp{font-size:13px; color:var(--paper-dim); margin-top:8px; border-top:1px solid var(--line); padding-top:8px}
+
+.empty{text-align:center; color:var(--muted); padding:40px}
+.hide{display:none !important}
+.footer-note{text-align:center; color:var(--muted); font-size:12px; margin-top:40px; letter-spacing:.03em}
+.flagbtn{cursor:pointer; background:none; border:1px solid var(--line-2); border-radius:9px; color:var(--muted);
+  font-family:inherit; font-size:12px; padding:9px 13px}
+.flagbtn.on{border-color:var(--red); color:var(--red)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- HOME -->
+  <section id="home">
+    <div class="masthead">
+      <div class="eyebrow">The Investing Group &mdash; Examination Trainer</div>
+      <div class="rule-dot"></div>
+      <h1 class="title">The Three Books<br><em>operating philosophy</em></h1>
+      <p class="sub">Master <i>The Book of Elon</i>, <i>The Almanack of Naval Ravikant</i>, and <i>Zero to One</i> &mdash; 150 questions built for the bubble sheet at Caf&eacute; One.</p>
+      <div class="barbadge">Pass the bar: <b>35&nbsp;/&nbsp;50 &middot; 70%</b></div>
+    </div>
+
+    <div class="modes">
+      <button class="mode" onclick="startLearn()">
+        <div class="num">01</div>
+        <h3>Learn</h3>
+        <p>Flashcards. See a question, think, then reveal the answer and the why. No pressure, pure absorption.</p>
+        <div class="go">Study cards &rarr;</div>
+      </button>
+      <button class="mode" onclick="startPractice()">
+        <div class="num">02</div>
+        <h3>Practice</h3>
+        <p>Answer and get instant feedback with explanations. A running score tells you where you stand.</p>
+        <div class="go">Drill with feedback &rarr;</div>
+      </button>
+      <button class="mode" onclick="startExam()">
+        <div class="num">03</div>
+        <h3>Mock Exam</h3>
+        <p>50 questions, 60-minute clock, no feedback until you submit &mdash; the real thing. Scored against the bar.</p>
+        <div class="go">Sit the exam &rarr;</div>
+      </button>
+    </div>
+
+    <div class="panel">
+      <div class="panel-h">Focus your set &mdash; choose books</div>
+      <div class="chips" id="bookChips"></div>
+    </div>
+
+    <p class="footer-note">In-browser study tool &middot; 150 questions across the three books &middot; progress resets when you close the page.</p>
+  </section>
+
+  <!-- LEARN -->
+  <section id="learn" class="hide">
+    <div class="topbar">
+      <div class="left">
+        <button class="back" onclick="goHome()">&larr; Home</button>
+        <span class="counter">Card <b id="lnNow">1</b> / <span id="lnTot">0</span></span>
+      </div>
+      <div class="btn-row">
+        <button class="btn ghost" onclick="shuffleLearn()">Shuffle</button>
+      </div>
+    </div>
+    <div class="progress"><i id="lnBar" style="width:0%"></i></div>
+    <div class="qcard">
+      <span class="qtag"><span class="dot" id="lnDot"></span><span id="lnBook"></span> &middot; <span class="qtopic" id="lnTopic"></span></span>
+      <div class="qtext" id="lnText"></div>
+      <div class="opts" id="lnOpts"></div>
+      <div id="lnFlip" class="flip hide">
+        <div class="ans-key" id="lnAnsKey"></div>
+        <div class="explain"><span id="lnExp"></span></div>
+      </div>
+      <div class="nav-row">
+        <button class="btn ghost" id="lnPrev" onclick="lnStep(-1)">&larr; Prev</button>
+        <button class="btn primary" id="lnReveal" onclick="lnRevealToggle()">Reveal answer</button>
+        <button class="btn ghost" id="lnNext" onclick="lnStep(1)">Next &rarr;</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- PRACTICE -->
+  <section id="practice" class="hide">
+    <div class="topbar">
+      <div class="left">
+        <button class="back" onclick="goHome()">&larr; Home</button>
+        <span class="counter">Q <b id="prNow">1</b> / <span id="prTot">0</span></span>
+      </div>
+      <span class="score-pill">Score: <b id="prScore">0</b> <span id="prScoreSub" style="color:var(--muted)"></span></span>
+    </div>
+    <div class="progress"><i id="prBar" style="width:0%"></i></div>
+    <div class="qcard">
+      <span class="qtag"><span class="dot" id="prDot"></span><span id="prBook"></span> &middot; <span class="qtopic" id="prTopic"></span></span>
+      <div class="qtext" id="prText"></div>
+      <div class="opts" id="prOpts"></div>
+      <div id="prExplain" class="explain hide"></div>
+      <div class="nav-row">
+        <span class="counter" id="prHint">Pick an answer</span>
+        <button class="btn primary hide" id="prNext" onclick="prNextQ()">Next &rarr;</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- EXAM -->
+  <section id="exam" class="hide">
+    <div class="topbar">
+      <div class="left">
+        <button class="back" onclick="confirmQuit()">&larr; Quit</button>
+        <span class="counter">Q <b id="exNow">1</b> / <span id="exTot">50</span></span>
+      </div>
+      <div class="btn-row">
+        <button class="flagbtn" id="exFlag" onclick="exToggleFlag()">&#9873; Flag</button>
+        <span class="timer" id="exTimer">60:00</span>
+      </div>
+    </div>
+    <div class="progress"><i id="exBar" style="width:0%"></i></div>
+    <div class="qcard">
+      <span class="qtag"><span class="dot" id="exDot"></span><span id="exBook"></span> &middot; <span class="qtopic" id="exTopic"></span></span>
+      <div class="qtext" id="exText"></div>
+      <div class="opts" id="exOpts"></div>
+      <div class="nav-row">
+        <button class="btn ghost" id="exPrev" onclick="exStep(-1)">&larr; Prev</button>
+        <div class="btn-row">
+          <button class="btn ghost" id="exNext" onclick="exStep(1)">Next &rarr;</button>
+          <button class="btn primary" onclick="submitExam(false)">Submit exam</button>
+        </div>
+      </div>
+      <div class="qgrid" id="exGrid"></div>
+    </div>
+  </section>
+
+  <!-- RESULTS -->
+  <section id="results" class="hide">
+    <div class="topbar"><button class="back" onclick="goHome()">&larr; Home</button></div>
+    <div class="result">
+      <div class="eyebrow" id="rsKind">Mock Exam Result</div>
+      <div class="verdict-big" id="rsVerdict"></div>
+      <div class="ring">
+        <svg width="172" height="172" viewBox="0 0 172 172">
+          <circle cx="86" cy="86" r="74" fill="none" stroke="#2a2318" stroke-width="13"></circle>
+          <circle id="rsRing" cx="86" cy="86" r="74" fill="none" stroke="#d7b25e" stroke-width="13"
+                  stroke-linecap="round" stroke-dasharray="465" stroke-dashoffset="465"></circle>
+        </svg>
+        <div class="pct"><span class="n" id="rsPct">0%</span><span class="l" id="rsRaw">0 / 0</span></div>
+      </div>
+      <p class="sub" id="rsMsg"></p>
+      <div class="breakdown" id="rsBreak"></div>
+      <div class="btn-row" style="justify-content:center; margin-top:22px">
+        <button class="btn primary" onclick="startExam()">Retake exam</button>
+        <button class="btn ghost" onclick="goHome()">Back to home</button>
+      </div>
+    </div>
+    <h3 class="review-h" id="rsRevH">Review &mdash; questions to revisit</h3>
+    <div id="rsReview"></div>
+  </section>
+
+</div>
+
+<script>
+const QUESTIONS = [{"id": 1, "book": "The Book of Elon", "topic": "First Principles", "question": "What does 'reasoning from first principles' mean in Musk's framework?", "options": {"A": "Copying what successful competitors have already proven works", "B": "Boiling a problem down to its fundamental truths and reasoning up from there", "C": "Trusting the consensus of the smartest experts in the field", "D": "Optimizing an existing process until it can't be improved further"}, "answer": "B", "explanation": "First-principles thinking strips away assumptions and inherited beliefs, breaking a problem down to what is physically/fundamentally true, then building the solution up from that base."}, {"id": 2, "book": "The Book of Elon", "topic": "First Principles", "question": "Musk contrasts first-principles thinking with which inferior default mode of reasoning?", "options": {"A": "Reasoning by analogy (doing things because that's how they've always been done)", "B": "Reasoning by experiment", "C": "Reasoning by physics", "D": "Reasoning by deletion"}, "answer": "A", "explanation": "Reasoning by analogy copies what already exists with slight variation. First principles instead derive the answer from fundamentals, which is how genuinely new things get built."}, {"id": 3, "book": "The Book of Elon", "topic": "First Principles", "question": "In Musk's famous battery-cost example, what does first-principles thinking reveal?", "options": {"A": "Batteries are inherently expensive and the price can never fall", "B": "The cost of the raw constituent materials is far lower than the market price of a finished pack", "C": "Battery cost is determined purely by patent licensing", "D": "Buying batteries is always cheaper than making them"}, "answer": "B", "explanation": "Musk broke a battery into its material constituents (nickel, cobalt, aluminum, carbon, etc.) priced as commodities, showing the floor cost was a fraction of the prevailing market price — proof the 'impossible' was just expensive by convention."}, {"id": 4, "book": "The Book of Elon", "topic": "Physics Mindset", "question": "Which phrase best captures how Musk treats physical reality when making decisions?", "options": {"A": "Physics is a recommendation; business is the law", "B": "Physics is the law; everything else is a recommendation", "C": "Marketing is the law; physics is optional", "D": "Tradition is the law; physics is negotiable"}, "answer": "B", "explanation": "Musk treats physical law as the only uncompromising judge. Conventions, regulations, and traditions can be questioned, but physics cannot — so he reasons from it."}, {"id": 5, "book": "The Book of Elon", "topic": "The Algorithm", "question": "What is the correct order of the five steps of 'The Algorithm'?", "options": {"A": "Automate, accelerate, simplify, delete, question requirements", "B": "Question requirements, delete, simplify/optimize, accelerate, automate", "C": "Delete, question requirements, automate, simplify, accelerate", "D": "Simplify, question requirements, automate, delete, accelerate"}, "answer": "B", "explanation": "The five steps run in strict sequence: (1) make requirements less dumb, (2) delete, (3) simplify/optimize, (4) accelerate cycle time, (5) automate. Order is non-negotiable."}, {"id": 6, "book": "The Book of Elon", "topic": "The Algorithm", "question": "Step one of The Algorithm is to 'make your requirements less dumb.' Why is this first?", "options": {"A": "Because the cheapest step should always come first", "B": "Because you can get a perfect answer to the wrong question if the requirement itself is flawed", "C": "Because requirements are usually already correct", "D": "Because automation depends on locking requirements early"}, "answer": "B", "explanation": "If the requirement is wrong, every later step optimizes the wrong thing. Questioning requirements first makes the question 'the least wrong possible' before any work is invested."}, {"id": 7, "book": "The Book of Elon", "topic": "The Algorithm", "question": "According to Musk, every requirement should come attached to what?", "options": {"A": "A budget line item", "B": "The name of a specific person who made it, not a department", "C": "A government regulation citation", "D": "A patent number"}, "answer": "B", "explanation": "Requirements must carry the name of a real, named person — never 'the legal department' or 'safety' — so the person can be asked to justify it and the requirement can be challenged."}, {"id": 8, "book": "The Book of Elon", "topic": "The Algorithm", "question": "Why does Musk say requirements 'from smart people' are the most dangerous?", "options": {"A": "Smart people never make mistakes", "B": "Because people are less likely to question them, so bad requirements slip through", "C": "Because smart people charge more", "D": "Because they are always correct and slow things down"}, "answer": "B", "explanation": "The intelligence of the source makes a requirement feel authoritative, so it goes unchallenged. Musk insists every requirement be questioned 'even if it came from me.'"}, {"id": 9, "book": "The Book of Elon", "topic": "The Algorithm", "question": "What is the counterintuitive 'add-back' calibration rule for the delete step?", "options": {"A": "Never restore anything you have deleted", "B": "If you aren't forced to add back about 10% of what you deleted, you didn't delete enough", "C": "Add back 90% of deletions to be safe", "D": "Delete everything and never add anything back"}, "answer": "B", "explanation": "If you never have to put deleted parts/processes back, you were too timid. Having to restore roughly 10% is the sign you cut aggressively enough."}, {"id": 10, "book": "The Book of Elon", "topic": "The Algorithm", "question": "What is the 'most common mistake' Musk warns about in The Algorithm?", "options": {"A": "Questioning a requirement too many times", "B": "Simplifying or optimizing a part or process that should not exist at all", "C": "Deleting too many parts at once", "D": "Hiring before automating"}, "answer": "B", "explanation": "Polishing something that should have been deleted is wasted effort. That's why delete comes before simplify, accelerate, and automate."}, {"id": 11, "book": "The Book of Elon", "topic": "The Algorithm", "question": "Which step of The Algorithm comes LAST, and why?", "options": {"A": "Delete, because removing parts is risky", "B": "Automate, because you should never automate a process until requirements are questioned and unnecessary parts are deleted", "C": "Question requirements, because that is the least important", "D": "Accelerate, because speed is dangerous"}, "answer": "B", "explanation": "Automation comes last. Automating before deleting/simplifying just bakes in waste — Musk's costly mistake at Tesla's factories."}, {"id": 12, "book": "The Book of Elon", "topic": "The Algorithm", "question": "The fiberglass-mat-on-the-battery-pack story illustrates which lesson?", "options": {"A": "Automation should come before questioning requirements", "B": "A part that solved no real problem triggered ~$2M of robotics; deleting the part deleted the whole expensive process", "C": "Noise and vibration are more important than fire safety", "D": "Robots are always the fastest solution"}, "answer": "B", "explanation": "The mats turned out to serve no measurable purpose. Deleting the part eliminated the automation, acceleration, and optimization that had been wrapped around 'a big pile of nonsense.'"}, {"id": 13, "book": "The Book of Elon", "topic": "The Algorithm", "question": "Which saying captures Musk's view on accelerating a process that shouldn't exist?", "options": {"A": "Measure twice, cut once", "B": "If you're digging your grave, don't dig it faster — stop digging", "C": "Move fast and break things", "D": "Slow is smooth, smooth is fast"}, "answer": "B", "explanation": "Speeding up a process that ought to be deleted only gets you to the wrong place faster. Delete first; accelerate only what survives."}, {"id": 14, "book": "The Book of Elon", "topic": "The Algorithm", "question": "What was Musk's most expensive manufacturing mistake, by his own account?", "options": {"A": "Under-staffing the design team", "B": "Over-automating production (e.g., Model 3 in Fremont/Nevada) before deleting and simplifying", "C": "Spending too much on advertising", "D": "Outsourcing battery cell production"}, "answer": "B", "explanation": "He tried to automate every step too early, creating an over-complex line. The fix was to step back through the algorithm and delete/simplify first — 'excessive automation was a mistake.'"}, {"id": 15, "book": "The Book of Elon", "topic": "Design Principle", "question": "Which design maxim does Musk repeat about parts and processes?", "options": {"A": "The best part is a custom part; the best process is a long process", "B": "The best part is no part; the best process is no process", "C": "The best part is the cheapest part", "D": "The best part is an automated part"}, "answer": "B", "explanation": "The ideal is elimination, not optimization. The cleanest part is the one you removed entirely — directly tied to the delete step."}, {"id": 16, "book": "The Book of Elon", "topic": "Purpose & Mission", "question": "What does Jorgenson identify as Musk's 'superpowers'?", "options": {"A": "Charm and luck", "B": "Purpose and intensity", "C": "Capital and connections", "D": "Patience and caution"}, "answer": "B", "explanation": "The book argues it isn't charm, luck, or raw genius that made him the wealthiest person on Earth — it's purpose and intensity, both framed as choices rather than gifts."}, {"id": 17, "book": "The Book of Elon", "topic": "Purpose & Mission", "question": "How does the book frame 'purpose' relative to a company's longevity?", "options": {"A": "Purpose is a distraction from quarterly targets", "B": "Purpose acts like gravity — mission-driven companies compound while target-driven ones don't", "C": "Purpose only matters for nonprofits", "D": "Purpose should be abandoned once a company is profitable"}, "answer": "B", "explanation": "Purpose is described as 'gravity' that holds effort together over decades. Companies built on enduring missions compound; those built only on quarterly numbers don't."}, {"id": 18, "book": "The Book of Elon", "topic": "Purpose & Mission", "question": "What is the core mission of SpaceX as presented in the book?", "options": {"A": "To win government launch contracts", "B": "To make life multiplanetary as a backup for consciousness", "C": "To dominate the satellite TV market", "D": "To privatize NASA"}, "answer": "B", "explanation": "SpaceX exists to make humanity multiplanetary, treating Mars settlement as insurance for the long-term survival of consciousness — a 'colossal mission.'"}, {"id": 19, "book": "The Book of Elon", "topic": "Purpose & Mission", "question": "What is Tesla's stated mission?", "options": {"A": "To build the most luxurious cars", "B": "To accelerate the world's transition to sustainable energy", "C": "To maximize quarterly profit per vehicle", "D": "To replace all public transit"}, "answer": "B", "explanation": "Tesla's mission is accelerating the transition to sustainable energy — cars, storage, and solar are means to that civilizational end."}, {"id": 20, "book": "The Book of Elon", "topic": "Purpose & Mission", "question": "According to the book's framing, which of these scales and which does not?", "options": {"A": "Talent scales; purpose does not", "B": "Purpose scales; talent does not", "C": "Both scale equally", "D": "Neither scales"}, "answer": "B", "explanation": "A central thesis: 'Purpose scales. Talent doesn't.' You can't add enough talented individuals to substitute for a mission that aligns and compounds an entire organization."}, {"id": 21, "book": "The Book of Elon", "topic": "Intensity & Urgency", "question": "How does Musk treat the sense of urgency on his missions?", "options": {"A": "He waits for ideal market conditions", "B": "He manufactures urgency, behaving as if the mission is desperately time-critical", "C": "He believes urgency causes mistakes and avoids it", "D": "He delegates urgency to middle managers"}, "answer": "B", "explanation": "Musk deliberately manufactures urgency, compressing timelines and treating missions as if they cannot wait — fuel for intensity."}, {"id": 22, "book": "The Book of Elon", "topic": "Failure", "question": "What is Musk's attitude toward failure?", "options": {"A": "Failure should be punished to keep standards high", "B": "Failure is treated as data and fuel; if you're not failing, you're not innovating enough", "C": "Failure means the mission was wrong and should be abandoned", "D": "Failure should be hidden from the team"}, "answer": "B", "explanation": "Failure is reframed as feedback, not a verdict. A lack of failures signals you aren't pushing the frontier — 'failure is an option here.'"}, {"id": 23, "book": "The Book of Elon", "topic": "Attention & Focus", "question": "What does the book say about how Musk manages his attention?", "options": {"A": "He says yes to as many opportunities as possible", "B": "He protects attention ferociously and says no to almost everything to say yes completely to what matters most", "C": "He multitasks across dozens of equal priorities", "D": "He delegates all focus decisions to his board"}, "answer": "B", "explanation": "Protecting attention is treated as a core discipline: say no to almost everything so you can pour full energy into the one mission that matters."}, {"id": 24, "book": "The Book of Elon", "topic": "Hiring & Teams", "question": "What does Musk prioritize most when hiring?", "options": {"A": "Prestigious degrees and pedigree", "B": "Evidence of exceptional ability and the right attitude over formal credentials", "C": "Years of experience at large incumbents", "D": "Willingness to accept the lowest salary"}, "answer": "B", "explanation": "Musk weights demonstrated ability, drive, and problem-solving over credentials — a degree is not required if there's evidence of exceptional capability."}, {"id": 25, "book": "The Book of Elon", "topic": "Hiring & Teams", "question": "What is Musk's view on talent density and 'A players'?", "options": {"A": "A few A players can be diluted safely by many B players", "B": "A players attract A players; a high concentration of top talent is worth protecting", "C": "Talent density is irrelevant if processes are good", "D": "Hire as many people as possible regardless of quality"}, "answer": "B", "explanation": "Top performers want to work with other top performers. Protecting talent density keeps the bar high and is more valuable than headcount."}, {"id": 26, "book": "The Book of Elon", "topic": "Communication", "question": "What is Musk's rule about internal communication?", "options": {"A": "Always route messages up the chain of command before acting", "B": "Communicate directly with whoever can solve the problem, rather than up and down a hierarchy", "C": "Limit communication to weekly scheduled meetings", "D": "Only managers may talk to other managers"}, "answer": "B", "explanation": "Musk encourages the shortest path: talk directly to the person who can fix the issue. Forcing communication through a chain of command is treated as a failure mode."}, {"id": 27, "book": "The Book of Elon", "topic": "Manufacturing", "question": "What does Musk consider 'the hard part' that companies underrate?", "options": {"A": "Designing a prototype", "B": "Building the machine that builds the machine — manufacturing at scale", "C": "Filing patents", "D": "Hiring a marketing team"}, "answer": "B", "explanation": "Prototypes are comparatively easy; production is the brutal challenge. 'The factory is the product' — designing the manufacturing system is the hard, decisive work."}, {"id": 28, "book": "The Book of Elon", "topic": "Manufacturing", "question": "What is the 'idiot index' Musk uses to evaluate a component?", "options": {"A": "The number of engineers assigned to it", "B": "The ratio of a finished part's cost to the cost of its raw materials", "C": "The number of patents covering it", "D": "Its weight relative to the vehicle"}, "answer": "B", "explanation": "The idiot index is finished cost divided by raw-material cost. A high ratio signals the part is badly designed or manufactured and ripe for first-principles attack."}, {"id": 29, "book": "The Book of Elon", "topic": "Bottlenecks", "question": "How does Musk approach a production line that is choking throughput?", "options": {"A": "He spreads attention evenly across all stations", "B": "He concentrates force on the rate-limiting constraint, sometimes living on that line until it's fixed", "C": "He shuts the whole line down indefinitely", "D": "He immediately adds more automation everywhere"}, "answer": "B", "explanation": "Musk attacks the single binding bottleneck with overwhelming focus (e.g., 'living on the battery-pack line'), because relieving the constraint unlocks the whole system."}, {"id": 30, "book": "The Book of Elon", "topic": "Product & Marketing", "question": "What is notable about Tesla's traditional advertising spend?", "options": {"A": "It is the largest in the auto industry", "B": "It has been essentially zero — the strategy is to make the product so good it sells itself", "C": "It is focused entirely on TV commercials", "D": "It relies on celebrity endorsements"}, "answer": "B", "explanation": "Tesla historically spent ~nothing on paid advertising. The philosophy: pour resources into the product so it markets itself through word of mouth and quality."}, {"id": 31, "book": "The Book of Elon", "topic": "AI", "question": "How does Musk characterize advanced AI risk?", "options": {"A": "As entirely overblown and not worth attention", "B": "As a serious existential risk — 'like summoning the demon' if developed carelessly", "C": "As irrelevant to humanity's future", "D": "As something only governments should build"}, "answer": "B", "explanation": "Musk repeatedly frames unaligned advanced AI as among the greatest existential risks, motivating both caution and his involvement in shaping how it's built."}, {"id": 32, "book": "The Book of Elon", "topic": "Neuralink", "question": "What is the stated purpose behind Neuralink?", "options": {"A": "To replace smartphones with implants for entertainment", "B": "To increase human–AI bandwidth and enable a closer symbiosis with AI", "C": "To cure all diseases instantly", "D": "To upload human memories for profit"}, "answer": "B", "explanation": "Neuralink aims to raise the bandwidth between brain and machine so humans can keep pace with AI — a hedge tied to Musk's AI-risk concerns."}, {"id": 33, "book": "The Book of Elon", "topic": "Risk & Conviction", "question": "After PayPal, how did Musk deploy his proceeds?", "options": {"A": "He diversified into a broad index portfolio", "B": "He reinvested nearly everything into Tesla, SpaceX, and SolarCity, risking personal bankruptcy in 2008", "C": "He retired from operating companies", "D": "He bought safe government bonds"}, "answer": "B", "explanation": "Musk poured his fortune back into his missions, coming close to personal and corporate bankruptcy in 2008 — extreme conviction and skin in the game."}, {"id": 34, "book": "The Book of Elon", "topic": "Leadership", "question": "What does 'leading from the front' look like for Musk?", "options": {"A": "Issuing directives from a separate executive office", "B": "Working alongside the team in the trenches, even sleeping on the factory floor during crises", "C": "Avoiding the factory to stay strategic", "D": "Delegating all operational detail permanently"}, "answer": "B", "explanation": "Musk models the intensity he demands — sleeping at the factory and working directly on the line during crunch periods rather than directing from a distance."}, {"id": 35, "book": "The Book of Elon", "topic": "Decision-Making", "question": "What is Musk's bias when facing uncertainty about whether to act?", "options": {"A": "A bias toward gathering more data indefinitely", "B": "A bias toward action — move fast, prototype, and let reality correct the assumptions", "C": "A bias toward waiting for consensus", "D": "A bias toward outsourcing the decision"}, "answer": "B", "explanation": "Musk favors rapid action and iteration over analysis paralysis, using real-world feedback to correct course — paired with a willingness to be wrong quickly."}, {"id": 36, "book": "The Book of Elon", "topic": "Vertical Integration", "question": "Why do Musk's companies tend to build components in-house?", "options": {"A": "To avoid paying taxes", "B": "To control the stack, reduce cost via first principles, and move at the pace the mission requires", "C": "Because suppliers refuse to work with them", "D": "Purely for marketing reasons"}, "answer": "B", "explanation": "Vertical integration lets Musk apply first principles to the whole system, control quality and cost, and avoid being gated by suppliers' timelines and margins."}, {"id": 37, "book": "The Book of Elon", "topic": "Mindset", "question": "According to the book, purpose and intensity are best understood as:", "options": {"A": "Innate gifts you either have or don't", "B": "Decisions you make, not gifts you're born with", "C": "Side effects of wealth", "D": "Personality traits that cannot change"}, "answer": "B", "explanation": "The book's framing is explicit: 'Purpose and intensity are not gifts. They are decisions.' Anyone can choose a colossal mission and bring full energy to it."}, {"id": 38, "book": "The Book of Elon", "topic": "Optimism", "question": "What underlying view of the future motivates Musk's missions?", "options": {"A": "The future will be worse regardless of what we do", "B": "A definite optimism — we should actively build a future that is better, not merely different", "C": "The future is unknowable, so planning is pointless", "D": "The present is as good as it will ever get"}, "answer": "B", "explanation": "Musk's missions assume the future can be made better by deliberate building (sustainable energy, multiplanetary life). It's a definite, action-oriented optimism."}, {"id": 39, "book": "The Book of Elon", "topic": "Saying No", "question": "What is the relationship between saying 'no' and Musk's effectiveness?", "options": {"A": "Saying no is a sign of low ambition", "B": "Saying no to almost everything is what frees the full commitment that great missions demand", "C": "Successful people say yes to everything", "D": "Saying no only matters for small companies"}, "answer": "B", "explanation": "Ruthless 'no' to the many good options is the precondition for an unqualified 'yes' to the one mission worth full intensity."}, {"id": 40, "book": "The Book of Elon", "topic": "First Principles", "question": "Which is the better example of a first-principles question about a rocket?", "options": {"A": "'How much do rockets usually cost?'", "B": "'What are rockets physically made of, and what do those materials cost?'", "C": "'Which competitor has the cheapest rocket?'", "D": "'What did rockets cost last decade?'"}, "answer": "B", "explanation": "Asking what the object is fundamentally made of (and the floor cost of those materials) is first principles. Asking the prevailing market price is reasoning by analogy."}, {"id": 41, "book": "The Book of Elon", "topic": "Manufacturing", "question": "What does Musk mean by 'the machine that builds the machine'?", "options": {"A": "The software that designs prototypes", "B": "The factory/production system itself, which he treats as a product to be engineered", "C": "The supply contract with vendors", "D": "The marketing funnel"}, "answer": "B", "explanation": "Musk elevates the factory to a first-class engineering problem — designing the production system is as important as designing the product it makes."}, {"id": 42, "book": "The Book of Elon", "topic": "Teams", "question": "What does Musk believe about small teams vs. large bureaucracies?", "options": {"A": "Larger teams always produce better results", "B": "Small, capable teams with direct communication outperform bloated, hierarchical ones", "C": "Team size is irrelevant", "D": "Bureaucracy improves innovation"}, "answer": "B", "explanation": "Musk favors lean teams of high performers communicating directly. Excess hierarchy and headcount slow the feedback loops that drive progress."}, {"id": 43, "book": "The Book of Elon", "topic": "Standards", "question": "How does Musk set performance expectations?", "options": {"A": "He benchmarks only against direct competitors", "B": "He benchmarks against the physical limits of what's possible, not industry norms", "C": "He matches the industry average", "D": "He sets no fixed targets"}, "answer": "B", "explanation": "Targets are anchored to physics and theoretical limits rather than what competitors do, which is why goals often look impossible by conventional standards."}, {"id": 44, "book": "The Book of Elon", "topic": "Energy Mission", "question": "How does Musk view the urgency of the sustainable-energy transition?", "options": {"A": "As a slow, optional, multi-century effort", "B": "As an urgent transition worth accelerating, hence Tesla's mission verb 'accelerate'", "C": "As irrelevant to his business goals", "D": "As something only governments can address"}, "answer": "B", "explanation": "The mission's key word is 'accelerate' — Musk treats the energy transition as inevitable but too slow, and worth compressing in time."}, {"id": 45, "book": "The Book of Elon", "topic": "Learning", "question": "What does the book say about the relationship between Musk's knowledge and reading?", "options": {"A": "He learned everything from formal schooling only", "B": "He is famously self-taught across domains, learning by voracious reading and asking experts", "C": "He avoids reading to stay original", "D": "He relies solely on intuition"}, "answer": "B", "explanation": "Musk built cross-domain expertise (rocketry, manufacturing, software) largely through relentless self-directed reading and questioning experts — applied first principles to learning itself."}, {"id": 46, "book": "The Book of Elon", "topic": "Mission Selection", "question": "How does Musk decide which problems to work on?", "options": {"A": "He picks the easiest profitable niche", "B": "He picks problems that matter most to humanity's future, even if enormously hard", "C": "He picks whatever is trending", "D": "He lets investors choose for him"}, "answer": "B", "explanation": "Mission selection starts from 'what matters most for the future of humanity?' — sustainable energy, multiplanetary life, AI — then accepts the difficulty that comes with it."}, {"id": 47, "book": "The Book of Elon", "topic": "The Algorithm", "question": "If you faithfully apply The Algorithm in order, when should you bring in automation?", "options": {"A": "Immediately, before deleting anything", "B": "Only after requirements are questioned, parts deleted, and the process simplified and accelerated", "C": "Never — automation is forbidden", "D": "Right after questioning requirements"}, "answer": "B", "explanation": "Automation is step five. You automate only once the process has survived questioning, deletion, simplification, and acceleration — so you don't automate waste."}, {"id": 48, "book": "The Book of Elon", "topic": "Resilience", "question": "How does the book characterize Musk's response to setbacks like early SpaceX launch failures?", "options": {"A": "He abandoned the mission after the first failure", "B": "He treated each failure as data, iterated rapidly, and pressed on toward the mission", "C": "He blamed and dismissed the whole team", "D": "He stopped taking risks afterward"}, "answer": "B", "explanation": "Early SpaceX failures (multiple Falcon 1 attempts) are framed as iterative learning. Musk absorbed the data, fixed the problem, and continued — failure as fuel."}, {"id": 49, "book": "The Almanack of Naval Ravikant", "topic": "Wealth", "question": "What is Naval's foundational instruction about what to pursue?", "options": {"A": "Seek status, because status compounds fastest", "B": "Seek wealth, not money or status", "C": "Seek money first, then wealth", "D": "Seek fame, which converts to wealth"}, "answer": "B", "explanation": "Naval's core line: 'Seek wealth, not money or status.' Wealth is assets that earn while you sleep; money and status are downstream and can be traps."}, {"id": 50, "book": "The Almanack of Naval Ravikant", "topic": "Wealth", "question": "How does Naval define wealth?", "options": {"A": "The cash in your bank account", "B": "Assets that earn while you sleep — businesses and assets that work without your time", "C": "Your annual salary", "D": "Your social media following"}, "answer": "B", "explanation": "Wealth is owning assets — equity in a business, real estate, media, code — that generate value independent of your active labor, 'while you sleep.'"}, {"id": 51, "book": "The Almanack of Naval Ravikant", "topic": "Wealth vs Status", "question": "How does Naval distinguish wealth from status?", "options": {"A": "Wealth is zero-sum; status is positive-sum", "B": "Wealth is positive-sum (you can create it); status is zero-sum (your gain is someone's loss)", "C": "They are identical", "D": "Status creates more value for society"}, "answer": "B", "explanation": "Creating wealth grows the pie for everyone. Status is a ranking — to move up you push someone down — which is why status games tend to be destructive."}, {"id": 52, "book": "The Almanack of Naval Ravikant", "topic": "Money", "question": "In Naval's framing, what is money?", "options": {"A": "The ultimate goal of life", "B": "How we transfer time and wealth — social credit, the ability to direct others' labor", "C": "A form of status only", "D": "An illusion with no use"}, "answer": "B", "explanation": "Money is a tool: stored, transferable social credit that lets you direct resources and others' time. It is a means, not the end (which is wealth/freedom)."}, {"id": 53, "book": "The Almanack of Naval Ravikant", "topic": "Specific Knowledge", "question": "What is 'specific knowledge' according to Naval?", "options": {"A": "Knowledge you can get from any standardized course or certification", "B": "Knowledge you can't be trained for — found by pursuing genuine curiosity, that feels like play to you but looks like work to others", "C": "Memorized facts for exams", "D": "Knowledge that everyone already has"}, "answer": "B", "explanation": "Specific knowledge is highly individual, can't be taught in school, and is built by following authentic curiosity. It feels like play to you but is hard for others to replicate."}, {"id": 54, "book": "The Almanack of Naval Ravikant", "topic": "Specific Knowledge", "question": "Why is specific knowledge so valuable?", "options": {"A": "Because it is easy to outsource and automate", "B": "Because it can't be easily trained, outsourced, or automated, so it's hard to compete with", "C": "Because everyone can acquire it cheaply", "D": "Because it requires expensive credentials"}, "answer": "B", "explanation": "If knowledge can be trained, society can train others cheaply. Specific knowledge resists training, outsourcing, and automation — which is exactly why it commands a premium."}, {"id": 55, "book": "The Almanack of Naval Ravikant", "topic": "Leverage", "question": "What are the three broad forms of leverage Naval describes?", "options": {"A": "Time, effort, and luck", "B": "Labor, capital, and products with no marginal cost of replication (code & media)", "C": "Debt, equity, and savings", "D": "Fame, status, and connections"}, "answer": "B", "explanation": "Naval's three levers: labor (people working for you), capital (money), and products with zero marginal cost of replication — code and media — the newest and most powerful."}, {"id": 56, "book": "The Almanack of Naval Ravikant", "topic": "Leverage", "question": "Which form of leverage does Naval call 'permissionless'?", "options": {"A": "Labor, because you can always hire", "B": "Capital, because banks lend freely", "C": "Products with no marginal cost of replication — code and media", "D": "Status, because reputation is free"}, "answer": "C", "explanation": "Code and media are permissionless: you don't need anyone to let you write software or publish. They replicate at zero marginal cost and 'work while you sleep' — 'an army of robots, freely available.'"}, {"id": 57, "book": "The Almanack of Naval Ravikant", "topic": "Leverage", "question": "Which leverage form does Naval consider the oldest and least desirable?", "options": {"A": "Capital", "B": "Labor (people working for you)", "C": "Code", "D": "Media"}, "answer": "B", "explanation": "Labor is the oldest leverage but the least desirable to Naval — managing people is hard and the returns scale poorly compared to capital and especially code/media."}, {"id": 58, "book": "The Almanack of Naval Ravikant", "topic": "Leverage", "question": "What does it mean that code and media leverage gives you 'an army of robots'?", "options": {"A": "You must employ many engineers", "B": "Software and content keep producing value for you continuously, at zero marginal cost, without your ongoing time", "C": "You should literally buy robots", "D": "It only works for manufacturing firms"}, "answer": "B", "explanation": "A piece of code or media you create can serve unlimited people indefinitely without you doing more work — like tireless, free robots compounding output while you sleep."}, {"id": 59, "book": "The Almanack of Naval Ravikant", "topic": "Accountability", "question": "What does Naval say about accountability and risk?", "options": {"A": "Avoid accountability to stay safe", "B": "Embrace accountability and take business risks under your own name — society rewards it with responsibility, equity, and leverage", "C": "Always hide behind a company brand", "D": "Accountability only matters for executives"}, "answer": "B", "explanation": "Taking visible, named risk exposes you to downside but is exactly what society rewards with leverage, equity, and trust. Anonymity caps your upside."}, {"id": 60, "book": "The Almanack of Naval Ravikant", "topic": "Equity", "question": "Why does Naval say you won't get rich renting out your time?", "options": {"A": "Because hourly work is illegal", "B": "Because your inputs aren't scalable and you have no ownership/equity in the upside", "C": "Because time is unlimited", "D": "Because salaries always rise with inflation"}, "answer": "B", "explanation": "Wages are capped by hours and don't compound. Without ownership/equity, you can't capture the scalable upside — 'you must own equity to gain financial freedom.'"}, {"id": 61, "book": "The Almanack of Naval Ravikant", "topic": "Long-Term Games", "question": "What does Naval mean by 'play long-term games with long-term people'?", "options": {"A": "Switch partners frequently to find the best deal each time", "B": "Compound trust and returns by working repeatedly with the same trustworthy people over long horizons", "C": "Only play short games to reduce risk", "D": "Avoid long-term commitments entirely"}, "answer": "B", "explanation": "Wealth, relationships, and knowledge all compound. Repeated games with reliable people build trust and let returns compound — the foundation of his philosophy."}, {"id": 62, "book": "The Almanack of Naval Ravikant", "topic": "Compounding", "question": "What does Naval say is the source of 'all the returns in life'?", "options": {"A": "Luck alone", "B": "Compound interest — in money, relationships, and knowledge — via long-term games", "C": "Hard work measured in hours", "D": "Cutting costs"}, "answer": "B", "explanation": "Naval generalizes compound interest beyond money: relationships, reputation, and knowledge all compound, which is why long-term games dominate."}, {"id": 63, "book": "The Almanack of Naval Ravikant", "topic": "Partners", "question": "When choosing business partners, which trait does Naval prize most?", "options": {"A": "Intelligence above all", "B": "Energy above all", "C": "Integrity — because high intelligence and energy without it will eventually harm you", "D": "Connections above all"}, "answer": "C", "explanation": "Naval looks for intelligence, energy, and integrity. Integrity is decisive: a smart, energetic partner who lacks it 'is going to get you' — those traits become weapons against you."}, {"id": 64, "book": "The Almanack of Naval Ravikant", "topic": "Judgment", "question": "In the age of leverage, which skill does Naval say matters most?", "options": {"A": "Speed of typing", "B": "Judgment — knowing what to do is decisive when leverage multiplies the impact of each decision", "C": "Raw effort", "D": "Networking"}, "answer": "B", "explanation": "When leverage amplifies every decision, choosing the right action (judgment) dominates. 'In an age of infinite leverage, judgment is the most important skill.'"}, {"id": 65, "book": "The Almanack of Naval Ravikant", "topic": "Productize Yourself", "question": "What does 'productize yourself' mean?", "options": {"A": "Become a generic, replaceable worker", "B": "Apply specific knowledge + accountability + leverage to your own unique combination of skills and identity", "C": "Sell branded merchandise", "D": "Copy a successful competitor exactly"}, "answer": "B", "explanation": "It's the synthesis: build specific knowledge, take accountability, and apply leverage — all aimed at the unique 'product' that only you can be."}, {"id": 66, "book": "The Almanack of Naval Ravikant", "topic": "Authenticity", "question": "How does Naval say you 'escape competition'?", "options": {"A": "By undercutting everyone on price", "B": "Through authenticity — be the best in the world at being yourself, where no one can compete", "C": "By copying the market leader", "D": "By working longer hours than rivals"}, "answer": "B", "explanation": "If you compete on what others do, you're in a crowd. Authenticity is a monopoly of one: 'Escape competition through authenticity' — nobody can be you."}, {"id": 67, "book": "The Almanack of Naval Ravikant", "topic": "Mastery", "question": "Complete Naval's instruction: 'Become the best in the world at what you do. Keep ___ until this is true.'", "options": {"A": "lowering your prices", "B": "redefining what you do", "C": "copying competitors", "D": "expanding your hours"}, "answer": "B", "explanation": "'Keep redefining what you do until this is true.' You reach a monopoly of one by narrowing and reshaping your work until you're uniquely the best at it."}, {"id": 68, "book": "The Almanack of Naval Ravikant", "topic": "Luck", "question": "Which is the highest form in the 'four kinds of luck' Naval discusses?", "options": {"A": "Blind luck that just happens to you", "B": "Luck from sheer hustle and motion", "C": "Luck from a unique character/brand that draws opportunities to you", "D": "Luck from spotting things others miss"}, "answer": "C", "explanation": "The four kinds: blind luck; luck from hustle; luck from awareness/spotting; and the highest — building a distinctive character and reputation so opportunities seek you out."}, {"id": 69, "book": "The Almanack of Naval Ravikant", "topic": "Earning", "question": "Naval advises you to earn with your ___, not your ___.", "options": {"A": "hands; head", "B": "mind; time", "C": "status; skill", "D": "time; mind"}, "answer": "B", "explanation": "'Earn with your mind, not your time.' Time-based earning doesn't scale or compound; intellect applied through leverage does."}, {"id": 70, "book": "The Almanack of Naval Ravikant", "topic": "Hourly Rate", "question": "What is Naval's advice about setting a personal hourly rate?", "options": {"A": "Never put a value on your time", "B": "Set an aspirational hourly rate and refuse or outsource any task worth less than it", "C": "Always do everything yourself to save money", "D": "Charge the industry minimum"}, "answer": "B", "explanation": "Pick a high aspirational rate; if a task is worth less than that rate, ignore it or pay someone else. It forces ruthless prioritization of your highest-leverage work."}, {"id": 71, "book": "The Almanack of Naval Ravikant", "topic": "Money & Freedom", "question": "What is the real purpose of money, in Naval's view?", "options": {"A": "To accumulate status objects", "B": "To buy freedom — including the freedom to stop thinking about money", "C": "To impress others", "D": "To outspend rivals"}, "answer": "B", "explanation": "Money's value is the freedom it buys: control over your time and the ability to stop worrying about money at all. 'The purpose of money is to not have to think about money.'"}, {"id": 72, "book": "The Almanack of Naval Ravikant", "topic": "Value Creation", "question": "How does Naval say you get rich (legitimately and at scale)?", "options": {"A": "By extracting value from others", "B": "By giving society what it wants but doesn't yet know how to get — at scale", "C": "By cutting corners", "D": "By inheriting it"}, "answer": "B", "explanation": "Wealth comes from delivering, at scale, something society wants but can't yet obtain. Solve a real need and use leverage to serve it broadly."}, {"id": 73, "book": "The Almanack of Naval Ravikant", "topic": "Reading & Learning", "question": "What is Naval's advice for building a reading habit?", "options": {"A": "Force yourself through 'important' books you dislike", "B": "Read what you love until you love to read", "C": "Read only summaries", "D": "Avoid reading; watch videos instead"}, "answer": "B", "explanation": "Start with whatever you genuinely enjoy. The habit and love of reading itself is the superpower; once it's cultivated, you can read anything."}, {"id": 74, "book": "The Almanack of Naval Ravikant", "topic": "Foundations", "question": "Which does Naval say is more valuable?", "options": {"A": "Broad shallow exposure to many advanced topics", "B": "Deep mastery of the foundations — basic math, logic, persuasion, economics", "C": "Memorizing trivia", "D": "Following the latest trends"}, "answer": "B", "explanation": "Naval stresses mastering fundamentals (arithmetic, basic logic, microeconomics, persuasion, computers) over chasing advanced or trendy material — foundations compound."}, {"id": 75, "book": "The Almanack of Naval Ravikant", "topic": "Happiness", "question": "How does Naval describe happiness?", "options": {"A": "A fixed trait you're born with", "B": "A skill and a choice that can be developed, like fitness", "C": "Something only money can buy", "D": "An accident outside your control"}, "answer": "B", "explanation": "Naval treats happiness as a trainable skill and a default choice — 'happiness is a skill you can develop' — not a fixed set point or a matter of circumstance."}, {"id": 76, "book": "The Almanack of Naval Ravikant", "topic": "Happiness", "question": "How does Naval often define happiness?", "options": {"A": "The presence of constant excitement", "B": "The absence of desire — the sense that nothing is missing in this moment", "C": "The accumulation of achievements", "D": "Winning status games"}, "answer": "B", "explanation": "Happiness is framed as the absence of the feeling that something is missing — a peaceful state where you're not pulled away from the present by desire."}, {"id": 77, "book": "The Almanack of Naval Ravikant", "topic": "Desire", "question": "Complete Naval's line: 'Desire is a contract you make with yourself to ___.'", "options": {"A": "achieve greatness", "B": "be unhappy until you get what you want", "C": "work harder", "D": "outcompete others"}, "answer": "B", "explanation": "'Desire is a contract you make with yourself to be unhappy until you get what you want.' So choose your desires deliberately — ideally one big one at a time."}, {"id": 78, "book": "The Almanack of Naval Ravikant", "topic": "Peace", "question": "How does Naval relate peace and happiness?", "options": {"A": "Peace and happiness are opposites", "B": "Peace is happiness at rest; happiness is peace in motion", "C": "Peace is irrelevant to happiness", "D": "Happiness requires giving up peace"}, "answer": "B", "explanation": "Naval describes them as two states of the same thing: 'Peace is happiness at rest, and happiness is peace in motion.'"}, {"id": 79, "book": "The Almanack of Naval Ravikant", "topic": "Present Moment", "question": "What does Naval say about the present moment?", "options": {"A": "The future is the only thing that matters", "B": "The present is the only real thing — the past is memory, the future is anticipation", "C": "Dwelling on the past creates happiness", "D": "Planning the future should consume all attention"}, "answer": "B", "explanation": "Naval emphasizes that the past is memory and the future is anticipation; only the present is real, so peace and happiness are found by being present."}, {"id": 80, "book": "The Almanack of Naval Ravikant", "topic": "Envy", "question": "What is Naval's test for envy/jealousy?", "options": {"A": "Compare only your wealth to others", "B": "Would you want that person's entire life — not just the one part you envy?", "C": "Always compare with people richer than you", "D": "Envy is a healthy motivator to copy"}, "answer": "B", "explanation": "Naval notes you can't cherry-pick one slice of someone's life. If you wouldn't trade your whole life for theirs, the envy is irrational."}, {"id": 81, "book": "The Almanack of Naval Ravikant", "topic": "Mind", "question": "How does Naval think your mind should relate to you?", "options": {"A": "The mind should be the master and you the servant", "B": "The mind should be a tool/servant you use, not a master that runs you", "C": "You should never use your mind", "D": "The mind cannot be trained"}, "answer": "B", "explanation": "Naval describes taming the 'monkey mind': the mind is a powerful tool, but most people are run by it. The goal is to make it serve you, not control you."}, {"id": 82, "book": "The Almanack of Naval Ravikant", "topic": "Meditation", "question": "How does Naval describe meditation?", "options": {"A": "A complex technique requiring gurus", "B": "Essentially the art of doing nothing — just sitting and observing the mind", "C": "A productivity hack to do more tasks", "D": "Pointless and a waste of time"}, "answer": "B", "explanation": "Naval frames meditation simply: do nothing, sit, and observe. Over time the noise quiets and the mind becomes a tool rather than a tyrant."}, {"id": 83, "book": "The Almanack of Naval Ravikant", "topic": "Health", "question": "Which combination does Naval describe as things that 'cannot be bought'?", "options": {"A": "A fast car, a big house, a yacht", "B": "A calm mind, a fit body, and a house full of love", "C": "A high salary and a prestigious title", "D": "Fame and influence"}, "answer": "B", "explanation": "'A calm mind, a fit body, a house full of love. These things cannot be bought — they must be earned' — Naval's marker of real wealth beyond money."}, {"id": 84, "book": "The Almanack of Naval Ravikant", "topic": "Patience", "question": "What is Naval's stance on patience with actions vs. results?", "options": {"A": "Be patient with actions and impatient with results", "B": "Be impatient with actions but patient with results", "C": "Be impatient with both", "D": "Be patient with both"}, "answer": "B", "explanation": "Move quickly and decisively on actions, but be patient as compounding does its work — 'impatient with actions, patient with results.'"}, {"id": 85, "book": "The Almanack of Naval Ravikant", "topic": "Games", "question": "What does Naval mean by 'play stupid games, win stupid prizes'?", "options": {"A": "Risky games always pay off", "B": "If you choose low-quality, zero-sum, or status games, you get correspondingly worthless outcomes", "C": "Games are always a waste of time", "D": "You should avoid all competition"}, "answer": "B", "explanation": "The games you choose determine your prizes. Pick wealth-creating, positive-sum, long-term games; status and zero-sum games yield 'stupid prizes.'"}, {"id": 86, "book": "The Almanack of Naval Ravikant", "topic": "Learning", "question": "According to Naval, what is actually scarce in education today?", "options": {"A": "Access to information", "B": "The desire to learn — information is abundant and mostly free", "C": "Teachers", "D": "Libraries"}, "answer": "B", "explanation": "Naval points out that essentially all knowledge is freely available now; the bottleneck is the genuine desire to learn, not access."}, {"id": 87, "book": "The Almanack of Naval Ravikant", "topic": "Retirement", "question": "How does Naval redefine retirement?", "options": {"A": "Reaching age 65", "B": "When you stop sacrificing today for an imagined tomorrow — when the present is enough", "C": "Accumulating a specific dollar amount", "D": "Quitting all work forever"}, "answer": "B", "explanation": "Retirement, for Naval, is a state of mind: when you no longer trade today for a hypothetical future and are content living in the present."}, {"id": 88, "book": "The Almanack of Naval Ravikant", "topic": "Big Decisions", "question": "Which three decisions does Naval highlight as dominating your life's outcomes?", "options": {"A": "Which car, which clothes, which phone", "B": "Where you live, who you're with, and what you do", "C": "Which stocks, which crypto, which bank", "D": "Which school, which degree, which title"}, "answer": "B", "explanation": "Naval emphasizes the high-leverage life choices: the city you live in, the people you surround yourself with, and the work you do — get these right and most else follows."}, {"id": 89, "book": "The Almanack of Naval Ravikant", "topic": "Honesty", "question": "Why does Naval value radical honesty?", "options": {"A": "It makes you popular", "B": "Being someone with nothing to hide makes you un-threatenable and frees your mind", "C": "It is required by law", "D": "It guarantees wealth"}, "answer": "B", "explanation": "If you never lie and have nothing to hide, no one can blackmail or manipulate you, and you carry no cognitive load of maintaining stories — a kind of freedom."}, {"id": 90, "book": "The Almanack of Naval Ravikant", "topic": "Self-Acceptance", "question": "What does Naval suggest about your relationship with yourself?", "options": {"A": "Constant self-criticism drives success", "B": "A degree of self-acceptance — you can be at peace with who you already are while still improving", "C": "You should never be satisfied", "D": "Identity should be tied entirely to net worth"}, "answer": "B", "explanation": "Naval blends ambition with acceptance: you can pursue growth while being fundamentally at peace with yourself in the present, rather than running on self-hatred."}, {"id": 91, "book": "The Almanack of Naval Ravikant", "topic": "Effort vs Leverage", "question": "Two people work equally hard, but one is rich and one is not. Per Naval, the likely difference is:", "options": {"A": "The rich one simply worked more hours", "B": "The rich one applied leverage and owned equity; the other rented time without ownership", "C": "Pure luck with no other factors", "D": "The rich one had a higher salary"}, "answer": "B", "explanation": "Equal effort yields wildly different outcomes depending on leverage and ownership. Renting time caps you; owning scalable assets and leverage uncaps you."}, {"id": 92, "book": "The Almanack of Naval Ravikant", "topic": "Specific Knowledge", "question": "Where does Naval say you find your specific knowledge?", "options": {"A": "By copying whatever pays the most today", "B": "By pursuing your genuine curiosity and passion rather than whatever is currently hot", "C": "By taking standardized tests", "D": "By following the crowd"}, "answer": "B", "explanation": "Specific knowledge is found at the edge of genuine curiosity — the things you'd do anyway. Chasing what's hot leads to competition; following authentic interest leads to a monopoly of one."}, {"id": 93, "book": "The Almanack of Naval Ravikant", "topic": "Wealth Mindset", "question": "Naval argues that money problems are best solved by:", "options": {"A": "Earning a bit more and spending a bit more", "B": "Becoming wealthy enough (and detached enough) that money stops occupying your mind", "C": "Avoiding money entirely", "D": "Chasing higher status"}, "answer": "B", "explanation": "Both more wealth and less desire reduce money's grip on your attention. The endgame is freedom from thinking about money, not a bigger pile to worry over."}, {"id": 94, "book": "The Almanack of Naval Ravikant", "topic": "Reputation", "question": "Why are long-term reputations so valuable in Naval's model?", "options": {"A": "They let you deceive people repeatedly", "B": "A trusted reputation lets others extend you leverage, capital, and opportunity in repeated games", "C": "They are only useful for celebrities", "D": "Reputation has no economic value"}, "answer": "B", "explanation": "In long-term games, a reputation for integrity and competence is an asset: people give the trustworthy more responsibility, capital, and equity, compounding over time."}, {"id": 95, "book": "The Almanack of Naval Ravikant", "topic": "Freedom", "question": "What kind of freedom does Naval ultimately prize?", "options": {"A": "Freedom to buy more things", "B": "Freedom 'from' — freedom from reaction, from anger, from things controlling you — alongside freedom to", "C": "Freedom to win status games", "D": "Freedom from all responsibility"}, "answer": "B", "explanation": "Naval distinguishes 'freedom to' from the deeper 'freedom from' — freedom from your own reactive patterns, attachments, and compulsions, which money alone can't buy."}, {"id": 96, "book": "The Almanack of Naval Ravikant", "topic": "Compounding Relationships", "question": "Why does Naval avoid people who play short-term, zero-sum games?", "options": {"A": "They are always poor", "B": "Repeated games with trustworthy people compound; dealing with zero-sum players destroys trust and returns", "C": "They are too ambitious", "D": "They never make money"}, "answer": "B", "explanation": "Trust is the compounding asset. Short-term, zero-sum players burn it, so Naval seeks long-term partners where cooperation compounds over many rounds."}, {"id": 97, "book": "Zero to One", "topic": "0 to 1 vs 1 to n", "question": "What is the difference between going from '0 to 1' and '1 to n'?", "options": {"A": "0 to 1 is copying; 1 to n is inventing", "B": "0 to 1 is creating something genuinely new (vertical progress); 1 to n is copying what works (horizontal progress)", "C": "They are the same thing", "D": "0 to 1 is globalization; 1 to n is technology"}, "answer": "B", "explanation": "0→1 is vertical/intensive progress — doing something nobody has done. 1→n is horizontal/extensive progress — taking what works and copying it widely."}, {"id": 98, "book": "Zero to One", "topic": "Technology vs Globalization", "question": "Thiel maps these two kinds of progress onto which pair of words?", "options": {"A": "Technology (0→1) and globalization (1→n)", "B": "Marketing and sales", "C": "Capitalism and competition", "D": "Hardware and software"}, "answer": "A", "explanation": "Technology is vertical progress (new things); globalization is horizontal progress (copying things across the world). The 20th century's challenge is more technology, not just more globalization."}, {"id": 99, "book": "Zero to One", "topic": "The Contrarian Question", "question": "What is Thiel's famous interview/contrarian question?", "options": {"A": "What is your greatest weakness?", "B": "What important truth do very few people agree with you on?", "C": "Where do you see yourself in five years?", "D": "Why should we hire you?"}, "answer": "B", "explanation": "The question that runs through the book: 'What important truth do very few people agree with you on?' Good answers are the seeds of valuable, non-obvious companies."}, {"id": 100, "book": "Zero to One", "topic": "The Contrarian Question", "question": "What is the 'business version' of the contrarian question?", "options": {"A": "What product is everyone already building?", "B": "What valuable company is nobody building?", "C": "What is the cheapest product to make?", "D": "Which competitor should we copy?"}, "answer": "B", "explanation": "Translated to business: 'What valuable company is nobody building?' The best startups create value in a space others have overlooked."}, {"id": 101, "book": "Zero to One", "topic": "Competition", "question": "What is Thiel's central claim about competition?", "options": {"A": "Competition is healthy and you should seek it", "B": "Competition is for losers — monopoly (creating something unique) is the goal", "C": "Competition guarantees high profits", "D": "Monopolies always harm society"}, "answer": "B", "explanation": "'Competition is for losers.' Perfect competition drives profits to zero. The successful path is to escape competition by being a one-of-a-kind monopoly."}, {"id": 102, "book": "Zero to One", "topic": "Perfect Competition", "question": "What happens to profits under perfect competition, per economic theory Thiel cites?", "options": {"A": "Profits stay high forever", "B": "Profits are competed away to zero — no firm earns economic profit in the long run", "C": "Profits are guaranteed by the government", "D": "Profits grow exponentially"}, "answer": "B", "explanation": "Under perfect competition, firms produce identical goods and compete prices down to marginal cost, leaving no economic profit. That's why Thiel wants to avoid it."}, {"id": 103, "book": "Zero to One", "topic": "Lies of Business", "question": "How do monopolists and competitive firms describe their markets, per Thiel?", "options": {"A": "Both describe their markets honestly", "B": "Monopolists pretend they're not monopolies (define market broadly); competitors pretend they're unique (define market narrowly)", "C": "Monopolists claim to be tiny; competitors claim to be huge", "D": "Neither describes its market at all"}, "answer": "B", "explanation": "Monopolists disguise their dominance by defining the market broadly. Competitive firms exaggerate uniqueness by defining the market narrowly. Both lie, in opposite directions."}, {"id": 104, "book": "Zero to One", "topic": "Monopoly Characteristics", "question": "Which set lists Thiel's four characteristics of a durable monopoly?", "options": {"A": "Low prices, heavy ads, many competitors, fast growth", "B": "Proprietary technology, network effects, economies of scale, and branding", "C": "Cheap labor, debt, lobbying, and patents only", "D": "First-mover speed, virality, hype, and funding"}, "answer": "B", "explanation": "Thiel's four traits of monopoly: proprietary technology, network effects, economies of scale, and strong branding."}, {"id": 105, "book": "Zero to One", "topic": "Proprietary Technology", "question": "How much better must proprietary technology be to constitute a real advantage, per Thiel?", "options": {"A": "About 10% better", "B": "Roughly 10x better than the nearest substitute", "C": "Exactly twice as good", "D": "Only marginally better is enough"}, "answer": "B", "explanation": "As a rule of thumb, proprietary technology should be at least 10x better than the closest substitute to create a defensible monopoly; incremental improvement isn't enough."}, {"id": 106, "book": "Zero to One", "topic": "Network Effects", "question": "What is the paradox of network effects for a startup?", "options": {"A": "They are useless at any scale", "B": "A product becomes more valuable as more people use it, yet it must be valuable to the very first users when the network is tiny", "C": "They only matter for hardware", "D": "They make starting easy and scaling hard"}, "answer": "B", "explanation": "Network effects require starting small: the product must already be valuable to its first few users before the network exists — which is why you begin with a tiny market."}, {"id": 107, "book": "Zero to One", "topic": "Economies of Scale", "question": "Why are economies of scale a monopoly advantage?", "options": {"A": "Costs rise as the business grows", "B": "A business gets stronger as it grows because fixed costs (e.g., software) spread over more output", "C": "They only help physical retailers", "D": "They force prices up"}, "answer": "B", "explanation": "A strong monopoly gets better at scale: high fixed cost, low marginal cost businesses (like software) spread costs over a growing base, widening the moat."}, {"id": 108, "book": "Zero to One", "topic": "Branding", "question": "What is Thiel's warning about branding as a monopoly source?", "options": {"A": "Branding is the strongest and safest moat", "B": "Branding without underlying substance is dangerous — you can't build a durable monopoly on brand alone", "C": "Branding is irrelevant", "D": "Only tech companies should brand"}, "answer": "B", "explanation": "Branding is real but the weakest/most dangerous to lead with. Trying to build a business on brand without a substantive product (Thiel's caution) fails over time."}, {"id": 109, "book": "Zero to One", "topic": "Building a Monopoly", "question": "What is Thiel's advice on which market to enter first?", "options": {"A": "Enter the largest market possible immediately", "B": "Start by dominating a small, specific market — it's easier to dominate small than large", "C": "Avoid niches entirely", "D": "Enter many markets at once"}, "answer": "B", "explanation": "'It is easier to dominate a small market than a large one.' Start with a tiny, well-defined market you can own, then expand outward."}, {"id": 110, "book": "Zero to One", "topic": "Building a Monopoly", "question": "Thiel says you should always err on the side of:", "options": {"A": "Starting too big", "B": "Starting too small", "C": "Raising as much money as possible first", "D": "Hiring as many people as possible first"}, "answer": "B", "explanation": "Err toward a market that's too small. A small market you can dominate beats a large one you can't — and you can scale up from a monopoly base."}, {"id": 111, "book": "Zero to One", "topic": "Scaling Up", "question": "After dominating its first niche, how should a monopoly expand?", "options": {"A": "Jump to an unrelated industry immediately", "B": "Expand into related, adjacent markets, deliberately and gradually", "C": "Stop growing to protect the niche", "D": "Acquire random competitors"}, "answer": "B", "explanation": "Thiel's model (Amazon: books → adjacent categories → everything) is to scale deliberately into related markets once you own the first one — not to leap into unrelated fields."}, {"id": 112, "book": "Zero to One", "topic": "Avoid Competition", "question": "What does Thiel mean by 'don't always go through the tiny door everyone is trying to rush through'?", "options": {"A": "Always pick the most crowded opportunity", "B": "Avoid hyper-competitive arenas; find the path around the corner where no one is fighting", "C": "Build doors for competitors", "D": "Compete harder than everyone else"}, "answer": "B", "explanation": "Rushing the crowded door (a fiercely competitive market) is a losing game. Look for the open route others ignore — escape competition rather than win it."}, {"id": 113, "book": "Zero to One", "topic": "Last Mover Advantage", "question": "What is the 'last mover advantage'?", "options": {"A": "Being first to launch at any cost", "B": "Making the last great development in a market and enjoying years or decades of monopoly profits", "C": "Copying the market leader late", "D": "Exiting a market before competitors"}, "answer": "B", "explanation": "Thiel prizes being the last mover — the one whose dominance endures. As in chess, 'you must study the endgame': durability of the monopoly matters more than being first."}, {"id": 114, "book": "Zero to One", "topic": "Valuation & Durability", "question": "Why does Thiel say durability is undervalued?", "options": {"A": "Because most of a company's value comes from near-term cash flows", "B": "Because most of a business's value lies in cash flows far in the future, so the question is whether it will still dominate in a decade", "C": "Because durability doesn't affect value", "D": "Because growth is irrelevant"}, "answer": "B", "explanation": "A business's value is the present value of all future cash flows; for great companies most value is years out. So 'will this still be a monopoly in 10–20 years?' is decisive."}, {"id": 115, "book": "Zero to One", "topic": "Optimism & Pessimism", "question": "Thiel's four views of the future are formed by crossing which two axes?", "options": {"A": "Rich vs poor and big vs small", "B": "Definite vs indefinite, and optimistic vs pessimistic", "C": "Fast vs slow and local vs global", "D": "Public vs private and old vs new"}, "answer": "B", "explanation": "The 2x2: definite vs indefinite (do you have a specific plan?) crossed with optimism vs pessimism (will the future be better or worse?)."}, {"id": 116, "book": "Zero to One", "topic": "Optimism & Pessimism", "question": "Which quadrant does Thiel associate with the mid-century United States (and admires)?", "options": {"A": "Indefinite pessimism", "B": "Definite optimism — concrete plans to build a better future", "C": "Definite pessimism", "D": "Indefinite optimism"}, "answer": "B", "explanation": "Thiel praises definite optimism (e.g., 1950s–60s America, the Apollo program): a belief the future will be better and a concrete plan to make it so."}, {"id": 117, "book": "Zero to One", "topic": "Optimism & Pessimism", "question": "How does Thiel characterize modern American (post-1980s) thinking about the future?", "options": {"A": "Definite optimism", "B": "Indefinite optimism — expecting a better future without any concrete plan to build it", "C": "Definite pessimism", "D": "Indefinite pessimism"}, "answer": "B", "explanation": "Thiel argues modern America drifted into indefinite optimism: assuming progress will continue while favoring optionality, finance, and process over concrete plans."}, {"id": 118, "book": "Zero to One", "topic": "Optimism & Pessimism", "question": "What does Thiel say about indefinite optimism's sustainability?", "options": {"A": "It compounds forever", "B": "It is unsustainable — 'you can't get rich from an indefinite future'; you have to actually build specific things", "C": "It is the ideal mindset for founders", "D": "It is identical to definite optimism"}, "answer": "B", "explanation": "Indefinite optimism inherits a better future without building it. Thiel argues that's unsustainable — wealth and progress require definite plans and concrete creation."}, {"id": 119, "book": "Zero to One", "topic": "Planning", "question": "What does a 'definite' view imply for how a startup should operate?", "options": {"A": "Maximize optionality and diversify across many bets", "B": "Have firm convictions and a concrete plan, betting big on a specific vision", "C": "Avoid making any decisions", "D": "Copy whatever competitors do"}, "answer": "B", "explanation": "Definite founders commit to a plan and a specific future. Thiel contrasts this with indefinite thinking that diversifies and keeps options open rather than building."}, {"id": 120, "book": "Zero to One", "topic": "The Power Law", "question": "What is the 'power law' of venture capital?", "options": {"A": "Returns are evenly distributed across all investments", "B": "A small number of investments (often one) return more than all the others combined", "C": "Most startups return modest, similar amounts", "D": "The worst investment dominates the fund"}, "answer": "B", "explanation": "VC returns follow a power law, not a normal distribution: the single best investment in a fund typically outperforms the entire rest of the portfolio combined."}, {"id": 121, "book": "Zero to One", "topic": "The Power Law", "question": "What lesson does the power law hold for individuals choosing a career or company?", "options": {"A": "Diversify across as many jobs as possible", "B": "Focus relentlessly on one thing you'll be best at — and that will be valuable — rather than hedging", "C": "Avoid commitment to keep options open", "D": "Join the largest possible company"}, "answer": "B", "explanation": "Because outcomes are power-law distributed, hedging dilutes the upside. Thiel argues you should concentrate on the one path most likely to be uniquely valuable."}, {"id": 122, "book": "Zero to One", "topic": "The Power Law", "question": "Thiel says 'diversification' as a strategy is for:", "options": {"A": "The most sophisticated investors", "B": "Those who don't know what they're doing — in a power-law world, you concentrate on the best bets", "C": "Everyone, always", "D": "Only monopolists"}, "answer": "B", "explanation": "In a power-law world, spreading bets thinly is an admission you can't pick winners. Thiel favors concentrated conviction over broad diversification."}, {"id": 123, "book": "Zero to One", "topic": "Secrets", "question": "What does Thiel say every great business is built around?", "options": {"A": "A famous founder", "B": "A secret — a valuable truth about the world that few others know or believe", "C": "A large marketing budget", "D": "A patent portfolio"}, "answer": "B", "explanation": "'Every great business is built around a secret that's hidden from the outside.' A monopoly succeeds because it knows something true and valuable that others miss."}, {"id": 124, "book": "Zero to One", "topic": "Secrets", "question": "Which is NOT one of Thiel's reasons people have stopped looking for secrets?", "options": {"A": "Incrementalism (only doing small, safe steps)", "B": "Risk aversion (fear of being wrong)", "C": "Complacency and 'flatness' (assuming someone would already have found it)", "D": "An overabundance of curiosity and risk-taking"}, "answer": "D", "explanation": "Thiel cites incrementalism, risk aversion, complacency, and 'flatness' (globalization makes the world feel fully explored). Excess curiosity/risk-taking is the opposite — it would help find secrets."}, {"id": 125, "book": "Zero to One", "topic": "Secrets", "question": "Thiel divides secrets into which two kinds?", "options": {"A": "Cheap secrets and expensive secrets", "B": "Secrets about nature and secrets about people", "C": "Technical secrets and legal secrets", "D": "Old secrets and new secrets"}, "answer": "B", "explanation": "Secrets about nature (undiscovered truths about the physical world) and secrets about people (things people don't know about themselves or won't say)."}, {"id": 126, "book": "Zero to One", "topic": "Secrets", "question": "Where is the best place to look for secrets, per Thiel?", "options": {"A": "Where everyone is already looking", "B": "Where no one else is looking", "C": "Only in established academic fields", "D": "Only inside large corporations"}, "answer": "B", "explanation": "If everyone is looking somewhere, the secrets there are likely found. The frontier — places others ignore — is where undiscovered, valuable truths remain."}, {"id": 127, "book": "Zero to One", "topic": "Foundations", "question": "What is 'Thiel's law' about a startup's foundation?", "options": {"A": "A startup can always fix early mistakes later", "B": "A startup messed up at its foundation cannot be fixed", "C": "Foundations don't matter if growth is fast", "D": "Founders should never co-found"}, "answer": "B", "explanation": "'Thiel's law': a startup botched at its foundation can't be patched afterward. Early decisions — co-founders, equity, structure — are nearly impossible to undo."}, {"id": 128, "book": "Zero to One", "topic": "Foundations", "question": "How does Thiel suggest you treat the choice of co-founders?", "options": {"A": "Casually — anyone available will do", "B": "As seriously as choosing a spouse; founder conflict can kill a company", "C": "Pick people you've never met for objectivity", "D": "Only co-found with investors"}, "answer": "B", "explanation": "Choosing co-founders is like a marriage. Pre-existing, strong relationships and shared history matter because founder breakups are among the deadliest startup risks."}, {"id": 129, "book": "Zero to One", "topic": "Foundations", "question": "What is Thiel's guidance on a startup CEO's cash salary?", "options": {"A": "Pay the CEO the highest salary to attract talent", "B": "Keep CEO cash pay low (he cites a low ceiling); low cash pay aligns everyone toward equity and the long term", "C": "CEO pay should be tied to quarterly stock price", "D": "Salary is irrelevant to alignment"}, "answer": "B", "explanation": "Thiel argues a high CEO cash salary signals short-term, status-seeking behavior. Low cash comp keeps the CEO focused on increasing equity value — and sets the tone for everyone."}, {"id": 130, "book": "Zero to One", "topic": "Foundations", "question": "What is Thiel's view on board size?", "options": {"A": "Bigger boards are always better for oversight", "B": "Keep the board small (he suggests three is ideal) so it can function", "C": "Boards should have at least ten members", "D": "Startups shouldn't have boards"}, "answer": "B", "explanation": "Thiel favors a small board — ideally three. A small board is easier to align and act decisively; large boards become dysfunctional."}, {"id": 131, "book": "Zero to One", "topic": "Foundations", "question": "What is Thiel's stance on involving people 'part-time' or as remote consultants early on?", "options": {"A": "Encouraged, to save money", "B": "Skeptical — everyone you involve should be committed full-time (and ideally in-person); otherwise misalignment grows", "C": "Required for all startups", "D": "Irrelevant to company health"}, "answer": "B", "explanation": "Thiel argues part-timers and remote consultants lack the alignment full-time, co-located commitment creates. People should be on the bus fully, or not at all."}, {"id": 132, "book": "Zero to One", "topic": "Culture", "question": "How does Thiel describe the best startup cultures?", "options": {"A": "Loose collections of mercenaries chasing pay", "B": "Like 'cults' (just a bit less crazy) — tribes of people fanatically devoted to a shared mission", "C": "Cultures with no shared beliefs", "D": "Pure meritocracies with no bonds"}, "answer": "B", "explanation": "The best startups resemble 'cults' that happen to be right about something the world doesn't yet see — tight tribes of believers, the opposite of a loose consultancy."}, {"id": 133, "book": "Zero to One", "topic": "Recruiting", "question": "When recruiting, what must your answer to 'Why should I join your company?' be?", "options": {"A": "We pay the most and have the best perks", "B": "An answer that is unique to your company — your mission and team, not generic perks or salary", "C": "We are the biggest in the industry", "D": "We have the nicest office"}, "answer": "B", "explanation": "Thiel says generic answers (salary, perks, prestige) attract mercenaries. The compelling pitch is specific: this mission, with these people, that no one else offers."}, {"id": 134, "book": "Zero to One", "topic": "Roles & Conflict", "question": "Why does Thiel recommend well-defined, non-overlapping roles?", "options": {"A": "To create more competition between employees", "B": "Because internal conflict mostly arises from people fighting over the same responsibilities; clear roles reduce it", "C": "Because roles should be vague for flexibility", "D": "Because it allows more layers of management"}, "answer": "B", "explanation": "Thiel argues that defining each person's role narrowly and distinctly reduces internal rivalry — people fight when responsibilities overlap, harming the company."}, {"id": 135, "book": "Zero to One", "topic": "Distribution", "question": "What is Thiel's key claim about distribution (sales)?", "options": {"A": "A great product always sells itself, so distribution is irrelevant", "B": "Distribution is essential and systematically underrated because it's hidden — even a great product needs a deliberate way to reach customers", "C": "Only bad products need distribution", "D": "Distribution matters only for B2C"}, "answer": "B", "explanation": "'Customers will not come just because you build it.' Thiel stresses distribution is as important as product and is undervalued precisely because good selling is invisible."}, {"id": 136, "book": "Zero to One", "topic": "Distribution", "question": "What financial relationship must hold for distribution to work?", "options": {"A": "CAC must exceed customer lifetime value", "B": "Customer lifetime value (CLV) must exceed customer acquisition cost (CAC)", "C": "Revenue must equal costs exactly", "D": "CAC and CLV are unrelated"}, "answer": "B", "explanation": "The lifetime value of a customer has to be greater than the cost to acquire that customer (CLV > CAC). If not, the distribution model is unprofitable."}, {"id": 137, "book": "Zero to One", "topic": "Distribution", "question": "In Thiel's distribution spectrum, which range is the hardest 'dead zone' to sell into?", "options": {"A": "Deals over $1 million (complex sales)", "B": "Mid-sized deals roughly $1,000–$100,000, too big for ads but too small for a salesforce", "C": "Sub-$1 viral products", "D": "Government contracts"}, "answer": "B", "explanation": "Thiel describes a 'dead zone': products priced too high for cheap mass marketing but too low to justify expensive personal/complex sales — the hardest range to distribute."}, {"id": 138, "book": "Zero to One", "topic": "Distribution", "question": "What characterizes 'complex sales'?", "options": {"A": "Cheap products sold by viral sharing", "B": "Very high-value deals closed personally by the CEO/founder, often with no traditional salespeople", "C": "Mass-market advertising", "D": "Self-serve online checkout"}, "answer": "B", "explanation": "Complex sales (e.g., SpaceX, Palantir) involve large, multi-year deals closed through personal relationships, often by the founder/CEO directly, with long sales cycles."}, {"id": 139, "book": "Zero to One", "topic": "Distribution", "question": "What makes 'viral marketing' work, per Thiel?", "options": {"A": "Spending heavily on TV ads", "B": "The product's core use naturally encourages users to invite others (e.g., sending money on PayPal)", "C": "Hiring celebrity endorsers", "D": "Cold-calling enterprises"}, "answer": "B", "explanation": "Viral growth is built into the product: using it spreads it. PayPal's referral/payment loop is the classic example — every transaction recruited new users."}, {"id": 140, "book": "Zero to One", "topic": "Selling", "question": "What does Thiel say about 'nerds' and salespeople?", "options": {"A": "Engineers naturally excel at sales", "B": "Technical people tend to underestimate sales and distribution because good selling looks effortless and hidden", "C": "Sales is unimportant in tech", "D": "Only salespeople sell; engineers never do"}, "answer": "B", "explanation": "Thiel notes engineers dismiss sales as beneath them, missing that 'everybody sells' — and that distribution often decides which superior product actually wins."}, {"id": 141, "book": "Zero to One", "topic": "Man and Machine", "question": "What is Thiel's view on computers and humans?", "options": {"A": "Computers will substitute for and replace humans", "B": "Computers are complements to humans, not substitutes — the best companies pair human judgment with machine power", "C": "Humans will be obsolete", "D": "Machines and humans should be kept fully separate"}, "answer": "B", "explanation": "Thiel argues the big opportunity is complementarity: humans and computers are good at different things. PayPal's fraud detection and Palantir pair human judgment with machine scale."}, {"id": 142, "book": "Zero to One", "topic": "The Seven Questions", "question": "Which is one of Thiel's 'seven questions every business must answer'?", "options": {"A": "The Marketing Question (which agency to hire)", "B": "The Engineering, Timing, Monopoly, People, Distribution, Durability, and Secret questions", "C": "The Tax Question", "D": "The Office Location Question"}, "answer": "B", "explanation": "The seven: Engineering, Timing, Monopoly, People, Distribution, Durability, and Secret. A great company must convincingly answer most or all of them."}, {"id": 143, "book": "Zero to One", "topic": "The Seven Questions", "question": "Why did most clean-tech (greentech) startups fail, in Thiel's analysis?", "options": {"A": "They answered all seven questions perfectly", "B": "They answered few of the seven questions — relying on hype and subsidies rather than engineering, monopoly, and distribution", "C": "They had too much proprietary technology", "D": "They started in markets that were too small"}, "answer": "B", "explanation": "Thiel argues the cleantech bubble companies flunked most of the seven questions (weak engineering edge, bad timing, no monopoly, poor distribution), while Tesla answered all of them."}, {"id": 144, "book": "Zero to One", "topic": "The Founder's Paradox", "question": "What is 'the founder's paradox' Thiel describes?", "options": {"A": "Founders are always perfectly ordinary people", "B": "Founders are often extreme, paradoxical figures (both insiders and outsiders) — companies need them, and shouldn't scapegoat or undervalue them", "C": "Founders should be replaced as soon as possible", "D": "Founders contribute nothing after launch"}, "answer": "B", "explanation": "Thiel observes founders tend to be paradoxical extremes (e.g., both privileged and outcast). Companies need these singular figures, and devaluing or expelling them is often a mistake."}, {"id": 145, "book": "Zero to One", "topic": "Closing Thesis", "question": "What does Thiel say is the 'single most important' task for the future?", "options": {"A": "Copying successful businesses worldwide", "B": "Finding singular, new ways to create things — making the future not just different, but better (going from 0 to 1)", "C": "Achieving perfect competition", "D": "Maximizing globalization without new technology"}, "answer": "B", "explanation": "The book closes on the 0→1 imperative: our task is to find new and better things, not merely copy what exists. Genuine creation, not imitation, makes a better future."}, {"id": 146, "book": "Zero to One", "topic": "Globalization Limits", "question": "Why does Thiel warn that globalization without new technology is dangerous?", "options": {"A": "Because copying is always illegal", "B": "Because spreading today's resource-intensive methods to everyone (1→n) without new technology strains the planet's resources", "C": "Because globalization is always good", "D": "Because technology is unnecessary"}, "answer": "B", "explanation": "If the whole world copies current industrial methods (1→n) without inventing better technology (0→1), resource and environmental limits make it unsustainable."}, {"id": 147, "book": "The Book of Elon", "topic": "The Algorithm", "question": "In The Algorithm, the 'simplify and optimize' step should be applied to what, specifically?", "options": {"A": "Every requirement before any are questioned", "B": "Only the steps and parts that survived the delete step", "C": "The automation layer first", "D": "The marketing process"}, "answer": "B", "explanation": "You simplify and optimize AFTER deleting — and only what remains. Optimizing something that should have been deleted is the classic mistake Musk warns against."}, {"id": 148, "book": "The Book of Elon", "topic": "The Algorithm", "question": "Why does Musk admit to repeating The Algorithm 'to an annoying degree'?", "options": {"A": "Because it is mostly a joke", "B": "Because organizations naturally drift back toward complexity, so the discipline must be hammered home constantly", "C": "Because he forgets the steps himself", "D": "Because investors require it"}, "answer": "B", "explanation": "Musk says he became 'a broken record' on The Algorithm because teams default back to adding parts and complexity; relentless repetition is what keeps the discipline alive."}, {"id": 149, "book": "The Almanack of Naval Ravikant", "topic": "Action", "question": "What does Naval mean by 'inspiration is perishable'?", "options": {"A": "Inspiration lasts forever, so you can wait", "B": "When you feel inspired, act on it immediately — the energy fades quickly if you delay", "C": "Inspiration is worthless", "D": "You should suppress inspiration to stay disciplined"}, "answer": "B", "explanation": "Naval stresses acting in the moment of inspiration: 'Inspiration is perishable — act on it immediately,' because the motivating energy decays fast."}, {"id": 150, "book": "The Almanack of Naval Ravikant", "topic": "Leverage", "question": "What does Naval's emphasis on code/media leverage imply for small teams today?", "options": {"A": "Only huge companies can win", "B": "A tiny team (or individual) wielding code and media can now out-produce and outcompete much larger organizations", "C": "Headcount always wins", "D": "Leverage only helps incumbents"}, "answer": "B", "explanation": "Because code and media replicate at zero marginal cost, a small, leveraged team can serve millions and outcompete big, labor-heavy incumbents — a core modern advantage."}];
+const BOOKS = ["The Book of Elon","The Almanack of Naval Ravikant","Zero to One"];
+const SHORT = {"The Book of Elon":"Elon","The Almanack of Naval Ravikant":"Naval","Zero to One":"Zero to One"};
+const COLOR = {"The Book of Elon":"var(--elon)","The Almanack of Naval Ravikant":"var(--naval)","Zero to One":"var(--thiel)"};
+const KEYS = ["A","B","C","D"];
+
+let selectedBooks = new Set(BOOKS); // home filter
+const $ = id => document.getElementById(id);
+const shuffle = a => { a=a.slice(); for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]];} return a; };
+function pool(){ return QUESTIONS.filter(q => selectedBooks.has(q.book)); }
+function show(view){ ["home","learn","practice","exam","results"].forEach(v=>$(v).classList.toggle("hide", v!==view)); window.scrollTo({top:0,behavior:"smooth"}); }
+function goHome(){ stopTimer(); show("home"); }
+
+/* ---- Home book chips ---- */
+function renderChips(){
+  const c=$("bookChips"); c.innerHTML="";
+  BOOKS.forEach(b=>{
+    const el=document.createElement("button");
+    el.className="chip"+(selectedBooks.has(b)?" on":"");
+    el.innerHTML=`<span class="dot" style="background:${COLOR[b]}"></span>${SHORT[b]==="Elon"?"The Book of Elon":(SHORT[b]==="Naval"?"Almanack of Naval":"Zero to One")}`;
+    el.onclick=()=>{ if(selectedBooks.has(b)){ if(selectedBooks.size>1) selectedBooks.delete(b);} else selectedBooks.add(b); renderChips(); };
+    c.appendChild(el);
+  });
+}
+renderChips();
+
+/* ============ LEARN (flashcards) ============ */
+let lnSet=[], lnIdx=0, lnRevealed=false;
+function startLearn(){ lnSet=shuffle(pool()); lnIdx=0; show("learn"); $("lnTot").textContent=lnSet.length; renderLearn(); }
+function shuffleLearn(){ lnSet=shuffle(lnSet); lnIdx=0; renderLearn(); }
+function renderLearn(){
+  const q=lnSet[lnIdx]; lnRevealed=false;
+  $("lnNow").textContent=lnIdx+1;
+  $("lnBar").style.width=((lnIdx+1)/lnSet.length*100)+"%";
+  $("lnDot").style.background=COLOR[q.book];
+  $("lnBook").textContent=SHORT[q.book]; $("lnTopic").textContent=q.topic;
+  $("lnText").textContent=q.question;
+  const o=$("lnOpts"); o.innerHTML="";
+  KEYS.forEach(k=>{
+    o.insertAdjacentHTML("beforeend",
+      `<div class="opt" data-k="${k}"><span class="key">${k}</span><span class="txt">${q.options[k]}</span></div>`);
+  });
+  $("lnFlip").classList.add("hide");
+  $("lnReveal").textContent="Reveal answer";
+  $("lnPrev").disabled=lnIdx===0; $("lnNext").disabled=lnIdx===lnSet.length-1;
+}
+function lnRevealToggle(){
+  const q=lnSet[lnIdx];
+  lnRevealed=!lnRevealed;
+  document.querySelectorAll("#lnOpts .opt").forEach(el=>{
+    el.classList.toggle("correct", lnRevealed && el.dataset.k===q.answer);
+  });
+  if(lnRevealed){
+    $("lnAnsKey").textContent="Answer: "+q.answer+". "+q.options[q.answer];
+    $("lnExp").innerHTML="<b>Why:</b> "+q.explanation;
+    $("lnFlip").classList.remove("hide");
+    $("lnReveal").textContent="Hide answer";
+  } else { $("lnFlip").classList.add("hide"); $("lnReveal").textContent="Reveal answer"; }
+}
+function lnStep(d){ const n=lnIdx+d; if(n<0||n>=lnSet.length)return; lnIdx=n; renderLearn(); }
+
+/* ============ PRACTICE ============ */
+let prSet=[], prIdx=0, prScore=0, prAnswered=false, prSeen=0;
+function startPractice(){ prSet=shuffle(pool()); prIdx=0; prScore=0; prSeen=0; show("practice"); $("prTot").textContent=prSet.length; renderPractice(); }
+function renderPractice(){
+  const q=prSet[prIdx]; prAnswered=false;
+  $("prNow").textContent=prIdx+1;
+  $("prBar").style.width=(prIdx/prSet.length*100)+"%";
+  $("prScore").textContent=prScore;
+  $("prScoreSub").textContent=prSeen?`/ ${prSeen}  (${Math.round(prScore/prSeen*100)}%)`:"";
+  $("prDot").style.background=COLOR[q.book];
+  $("prBook").textContent=SHORT[q.book]; $("prTopic").textContent=q.topic;
+  $("prText").textContent=q.question;
+  const o=$("prOpts"); o.innerHTML="";
+  KEYS.forEach(k=>{
+    const b=document.createElement("button");
+    b.className="opt"; b.dataset.k=k;
+    b.innerHTML=`<span class="key">${k}</span><span class="txt">${q.options[k]}</span>`;
+    b.onclick=()=>prPick(k);
+    o.appendChild(b);
+  });
+  $("prExplain").classList.add("hide");
+  $("prNext").classList.add("hide");
+  $("prHint").textContent="Pick an answer";
+  $("prHint").style.display="";
+}
+function prPick(k){
+  if(prAnswered)return; prAnswered=true; prSeen++;
+  const q=prSet[prIdx]; const correct=k===q.answer;
+  if(correct) prScore++;
+  document.querySelectorAll("#prOpts .opt").forEach(el=>{
+    el.disabled=true;
+    if(el.dataset.k===q.answer) el.classList.add("correct");
+    if(el.dataset.k===k && !correct) el.classList.add("wrong");
+  });
+  $("prScore").textContent=prScore;
+  $("prScoreSub").textContent=`/ ${prSeen}  (${Math.round(prScore/prSeen*100)}%)`;
+  const ex=$("prExplain");
+  ex.innerHTML=`<span class="verdict ${correct?'ok':'no'}">${correct?'Correct':'Not quite'}</span>`+
+    (correct?"":`<div style="margin-bottom:6px">Answer: <b>${q.answer}</b> &mdash; ${q.options[q.answer]}</div>`)+
+    `<b>Why:</b> ${q.explanation}`;
+  ex.classList.remove("hide");
+  $("prHint").style.display="none";
+  if(prIdx<prSet.length-1){ $("prNext").classList.remove("hide"); $("prNext").textContent="Next \u2192"; }
+  else { $("prNext").classList.remove("hide"); $("prNext").textContent="See summary \u2192"; }
+}
+function prNextQ(){
+  if(prIdx<prSet.length-1){ prIdx++; renderPractice(); }
+  else { // summary as a results screen (practice flavor)
+    showPracticeSummary();
+  }
+}
+function showPracticeSummary(){
+  $("prBar").style.width="100%";
+  buildResults({title:"Practice Summary", correct:prScore, total:prSeen, perBook:null, review:null, isExam:false});
+}
+
+/* ============ MOCK EXAM ============ */
+let exSet=[], exIdx=0, exAns={}, exFlags=new Set(), timerInt=null, timeLeft=3600;
+function startExam(){
+  let p=pool();
+  // 50 questions, proportionally across selected books, then top up randomly
+  const target=Math.min(50, p.length);
+  let chosen=[];
+  if(selectedBooks.size>1 && p.length>target){
+    const per=Math.floor(target/selectedBooks.size);
+    [...selectedBooks].forEach(b=>{ chosen=chosen.concat(shuffle(QUESTIONS.filter(q=>q.book===b)).slice(0,per)); });
+    const rest=shuffle(p.filter(q=>!chosen.includes(q)));
+    chosen=chosen.concat(rest.slice(0,target-chosen.length));
+    chosen=shuffle(chosen);
+  } else { chosen=shuffle(p).slice(0,target); }
+  exSet=chosen; exIdx=0; exAns={}; exFlags=new Set();
+  show("exam"); $("exTot").textContent=exSet.length;
+  buildGrid(); renderExam();
+  timeLeft=3600; startTimer();
+}
+function startTimer(){
+  stopTimer();
+  timerInt=setInterval(()=>{
+    timeLeft--;
+    const m=String(Math.floor(timeLeft/60)).padStart(2,"0"), s=String(timeLeft%60).padStart(2,"0");
+    $("exTimer").textContent=`${m}:${s}`;
+    $("exTimer").classList.toggle("warn", timeLeft<=300);
+    if(timeLeft<=0){ stopTimer(); submitExam(true); }
+  },1000);
+}
+function stopTimer(){ if(timerInt){ clearInterval(timerInt); timerInt=null; } }
+function buildGrid(){
+  const g=$("exGrid"); g.innerHTML="";
+  exSet.forEach((q,i)=>{
+    const b=document.createElement("button");
+    b.className="qbtn"; b.textContent=i+1; b.dataset.i=i;
+    b.onclick=()=>{ exIdx=i; renderExam(); };
+    g.appendChild(b);
+  });
+}
+function refreshGrid(){
+  document.querySelectorAll("#exGrid .qbtn").forEach((b,i)=>{
+    b.classList.toggle("answered", exAns[i]!=null);
+    b.classList.toggle("flagged", exFlags.has(i));
+    b.classList.toggle("current", i===exIdx);
+  });
+}
+function renderExam(){
+  const q=exSet[exIdx];
+  $("exNow").textContent=exIdx+1;
+  $("exBar").style.width=((exIdx+1)/exSet.length*100)+"%";
+  $("exDot").style.background=COLOR[q.book];
+  $("exBook").textContent=SHORT[q.book]; $("exTopic").textContent=q.topic;
+  $("exText").textContent=q.question;
+  const o=$("exOpts"); o.innerHTML="";
+  KEYS.forEach(k=>{
+    const b=document.createElement("button");
+    b.className="opt"+(exAns[exIdx]===k?" sel":""); b.dataset.k=k;
+    b.innerHTML=`<span class="key">${k}</span><span class="txt">${q.options[k]}</span>`;
+    b.onclick=()=>{ exAns[exIdx]=k; renderExam(); };
+    o.appendChild(b);
+  });
+  $("exPrev").disabled=exIdx===0; $("exNext").disabled=exIdx===exSet.length-1;
+  $("exFlag").classList.toggle("on", exFlags.has(exIdx));
+  refreshGrid();
+}
+function exStep(d){ const n=exIdx+d; if(n<0||n>=exSet.length)return; exIdx=n; renderExam(); }
+function exToggleFlag(){ if(exFlags.has(exIdx))exFlags.delete(exIdx); else exFlags.add(exIdx); renderExam(); }
+function confirmQuit(){ if(confirm("Quit the exam? Your progress on this attempt will be lost.")){ stopTimer(); goHome(); } }
+function submitExam(auto){
+  const unanswered=exSet.length-Object.keys(exAns).length;
+  if(!auto && unanswered>0){ if(!confirm(`You have ${unanswered} unanswered question(s). Submit anyway?`)) return; }
+  stopTimer();
+  let correct=0; const perBook={}; BOOKS.forEach(b=>perBook[b]={c:0,t:0});
+  const review=[];
+  exSet.forEach((q,i)=>{
+    perBook[q.book].t++;
+    const a=exAns[i];
+    if(a===q.answer){ correct++; perBook[q.book].c++; }
+    else review.push({q, your:a});
+  });
+  buildResults({title: auto?"Time's up — Exam Result":"Mock Exam Result", correct, total:exSet.length, perBook, review, isExam:true});
+}
+
+/* ============ RESULTS (shared) ============ */
+function buildResults({title, correct, total, perBook, review, isExam}){
+  show("results");
+  $("rsKind").textContent=title;
+  const pct = total? Math.round(correct/total*100) : 0;
+  const pass = pct>=70;
+  $("rsVerdict").textContent = isExam ? (pass?"You beat the bar.":"Below the bar.") : (pass?"Strong grasp.":"Gaps to close.");
+  $("rsVerdict").className="verdict-big "+(pass?"pass":"fail");
+  $("rsPct").textContent=pct+"%";
+  $("rsRaw").textContent=`${correct} / ${total}`;
+  // ring
+  const circ=465, off=circ*(1-pct/100);
+  const ring=$("rsRing");
+  ring.style.stroke = pass? "var(--green)":"var(--gold)";
+  ring.style.strokeDashoffset=circ;
+  setTimeout(()=>{ ring.style.transition="stroke-dashoffset 1s cubic-bezier(.2,.8,.2,1)"; ring.style.strokeDashoffset=off; },60);
+  $("rsMsg").textContent = isExam
+    ? (pass? `That clears TIG's 35/50 standard. Keep your weakest book sharp before the 8th.`
+           : `The bar is 35/50 (70%). Focus your next reps on the books below where you're light.`)
+    : (pass? `You're answering above the 70% bar in practice. Try a full timed mock exam next.`
+           : `Below 70% in practice. Re-study the study guide for weak topics, then drill again.`);
+  // breakdown
+  const bd=$("rsBreak"); bd.innerHTML="";
+  if(perBook){
+    BOOKS.forEach(b=>{
+      const d=perBook[b]; if(d.t===0)return;
+      const p=Math.round(d.c/d.t*100);
+      bd.insertAdjacentHTML("beforeend",
+        `<div class="bk"><div class="nm"><span class="dot" style="display:inline-block;width:9px;height:9px;border-radius:50%;background:${COLOR[b]}"></span>${SHORT[b]==="Elon"?"The Book of Elon":(SHORT[b]==="Naval"?"Almanack of Naval":"Zero to One")}</div>
+         <div class="sc">${d.c}/${d.t} <span style="font-size:14px;color:var(--muted)">&middot; ${p}%</span></div>
+         <div class="mini"><i style="width:${p}%;background:${p>=70?'var(--green)':'var(--gold)'}"></i></div></div>`);
+    });
+    bd.style.display="";
+  } else { bd.style.display="none"; }
+  // review
+  const rv=$("rsReview"); rv.innerHTML="";
+  if(review && review.length){
+    $("rsRevH").style.display=""; $("rsRevH").textContent=`Review — ${review.length} to revisit`;
+    review.forEach(({q,your})=>{
+      rv.insertAdjacentHTML("beforeend",
+        `<div class="rev">
+           <div class="q"><span style="color:${COLOR[q.book]};font-size:11px;letter-spacing:.1em;text-transform:uppercase">${SHORT[q.book]} &middot; ${q.topic}</span><br>${q.question}</div>
+           <div class="line yours">Your answer: ${your?your+'. '+q.options[your]:'(left blank)'}</div>
+           <div class="line right">Correct: ${q.answer}. ${q.options[q.answer]}</div>
+           <div class="exp"><b style="color:var(--gold-soft)">Why:</b> ${q.explanation}</div>
+         </div>`);
+    });
+  } else if(review){ // exam with no wrong answers
+    $("rsRevH").style.display=""; $("rsRevH").textContent="Review";
+    rv.innerHTML=`<div class="empty">Flawless — every question correct. Nothing to revisit.</div>`;
+  } else { // practice summary: no per-question review
+    $("rsRevH").style.display="none";
+  }
+}
+</script>
+</body>
+</html>
